@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <!-- 在这里注释也是没有问题的 -->
+        <!-- android:icon="@drawable/ic_menu_camera"-->
+        <!-- android:icon="@drawable/ic_menu_gallery"-->
+        <!-- android:icon="@drawable/ic_menu_slideshow"-->
+        <!-- android:icon="@drawable/ic_menu_manage"-->
+        <item
+            android:id="@+id/vedio_shoot"
+            android:title="@string/title_activity_vedio_shot" />
+        <item
+            android:id="@+id/delay_shoot"
+            android:title="@string/title_activity_delay_shot" />
+        <item
+            android:id="@+id/abpoint"
+            android:title="@string/title_activity_abpoint" />
+        <!--<item-->
+    <!--android:id="@+id/language"-->
+    <!--android:title="@string/language" />-->
+    </group>
+<!-- android:icon="@drawable/ic_menu_share"-->
+    <!-- android:icon="@drawable/ic_menu_send""-->
+    <item android:title="@string/Contact">
+        <menu>
+            <item
+                android:id="@+id/software_upgrade"
+                android:title="@string/software_upgrade" />
+            <item
+                android:id="@+id/support"
+                android:title="@string/support" />
+        </menu>
+    </item>
+
+</menu>
