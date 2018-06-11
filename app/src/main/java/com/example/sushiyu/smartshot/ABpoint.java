@@ -197,7 +197,7 @@ public class ABpoint extends AppCompatActivity
                 abpoint_set_flag = false;
                 Log.e(ABPOINT_TAG, "reset button press");
                 String tx_string = "0093010304000000";
-                abpoint_set.setText("A点设置");
+                abpoint_set.setText(R.string.a_point_setting);
                 if (!connect_status_bit)
                     return;
                 mBluetoothLeService.txxx(tx_string);

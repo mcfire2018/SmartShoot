@@ -6,7 +6,7 @@
     <string name="abpoint_notification_right">
         Press the left or right button to move the slider to the far Right and press ok key to determine the B-point of the slider</string>
     <string name="abpoint_notification_error">
-        AB点设置失败，请点击重置按钮重新设置AB点</string>
+        ABPoint Set Failed, Please Press The Reset Button</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="action_settings">Settings</string>
@@ -55,4 +55,5 @@
     <string name="Contact">Contact Us</string>
     <string name="software_upgrade">software upgrade</string>
     <string name="support">support：596400303@qq.com</string>
+    <string name="abpoint_reset">Reset</string>
 </resources>
