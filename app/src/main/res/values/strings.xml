@@ -55,4 +55,15 @@
     <string name="software_upgrade">软件升级</string>
     <string name="support">技术支持：596400303@qq.com</string>
     <string name="abpoint_reset">重置</string>
+    <string name="soft_update_no">soft_update_no</string>
+    <string name="soft_update_title">soft_update_title</string>
+    <string name="soft_update_info">soft_update_info</string>
+    <string name="soft_update_later">soft_update_later</string>
+    <string name="soft_update_updatebtn">soft_update_updatebtn</string>
+    <string name="soft_updating">soft_updating</string>
+    <string name="softupdate_progress">softupdate_progress</string>
+    <string name="soft_update_cancel">soft_update_cancel</string>
+
+
+
 </resources>

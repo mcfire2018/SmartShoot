@@ -463,6 +463,10 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.software_upgrade) {
 
+            UpdateManager manager = new UpdateManager(MainActivity.this);
+            // 检查软件更新
+            manager.checkUpdate();
+
         } else if (id == R.id.support) {
 
         }
