@@ -304,7 +304,7 @@ public class MainActivity extends AppCompatActivity
                 connect_status_bit=true;
                 delay(3000);
                 Log.e(MAINACTIVITY_TAG, "tx 0093040100000000");
-                timer_wait_mcu.schedule(task_wait_mcu, 1, 10);
+                timer_wait_mcu.schedule(task_wait_mcu, 1, 500);
                 wait_receive_mcu_msg_to = 10;
                 mBluetoothLeService.txxx("0093040100000000");
             } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
@@ -343,7 +343,7 @@ public class MainActivity extends AppCompatActivity
                             mDeviceAddress);
                     startActivity(intent1);
                 }
-                else if (str.equals("030B00") )
+                else if (str.substring(0,6).equals("030B00") )
                 {
                     Log.e(MAINACTIVITY_TAG, "030B00");
                     timer.cancel();
@@ -352,7 +352,7 @@ public class MainActivity extends AppCompatActivity
                     if (str.substring(6,10).equals("030A"))
                     {
                         String shot_maxtime = str.substring(12,14) + str.substring(10,12);
-                        DelayShot.max_shot_times = Integer.valueOf(shot_maxtime,16);
+                        DelayShot.max_shot_times_abpoint = Integer.valueOf(shot_maxtime,16);
 
                         Log.e(MAINACTIVITY_TAG, "max shot time"+ DelayShot.max_shot_times);
                     }

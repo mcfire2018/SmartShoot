@@ -99,7 +99,8 @@ public class UpdateManager
         int versionCode = getVersionCode(mContext);
         Log.e("soft_update", "versionCode = "+versionCode);
         // 把version.xml放到网络上，然后获取文件信息  
-        InputStream inStream = ParseXmlService.class.getClassLoader().getResourceAsStream("version.xml");  
+        //InputStream inStream = ParseXmlService.class.getClassLoader().getResourceAsStream("version.xml");
+        InputStream inStream = ParseXmlService.class.getClassLoader().getResourceAsStream("https://github.com/mcfire2018/SmartShoot.git/version.xml");
         // 解析XML文件。 由于XML文件比较小，因此使用DOM方式进行解析  
         ParseXmlService service = new ParseXmlService();  
         try  

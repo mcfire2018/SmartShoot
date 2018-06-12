@@ -2,8 +2,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="50dp"
+    android:layout_margin="60dp"
     android:layout_marginLeft="0dp"
+    android:background="#FFFFFF"
     android:orientation="vertical">
 
     <!--LinearLayout
@@ -363,7 +364,7 @@
                 android:layout_marginRight="0dp"
                 android:layout_marginTop="0dp"
                 android:text="@string/delayshot_shot_time"
-                android:textSize="16sp" />
+                android:textSize="12sp" />
 
             <TextView
                 android:id="@+id/shottime_total"
@@ -373,7 +374,7 @@
                 android:layout_marginRight="0dp"
                 android:layout_marginTop="0dp"
                 android:text="@string/delayshot_shot_time_default"
-                android:textSize="16sp" />
+                android:textSize="12sp" />
 
 
 
@@ -395,7 +396,7 @@
                 android:layout_marginRight="0dp"
                 android:layout_marginTop="0dp"
                 android:text="@string/delayshot_shot_remain"
-                android:textSize="16sp" />
+                android:textSize="12sp" />
 
 
 
@@ -406,7 +407,7 @@
                 android:layout_marginRight="0dp"
                 android:layout_marginTop="0dp"
                 android:text="@string/delayshot_shot_remain_default"
-                android:textSize="16sp" />
+                android:textSize="12sp" />
 
         </LinearLayout>
 

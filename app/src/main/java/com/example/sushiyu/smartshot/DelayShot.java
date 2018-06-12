@@ -49,7 +49,8 @@ public class DelayShot extends AppCompatActivity
     public static final String EXTRAS_DEVICE_NAME = "DEVICE_NAME";
     public static final String EXTRAS_DEVICE_ADDRESS = "DEVICE_ADDRESS";
     public static final String DELAYSHOT_TAG = "mcfire_delayshot";
-    public static int max_shot_times;
+    public static int max_shot_times_abpoint;/*save after abpoint setting*/
+    public static int max_shot_times;/*received from mcu*/
     private String mDeviceName;
     private String mDeviceAddress;
     public BluetoothLeService mBluetoothLeService;
@@ -85,11 +86,12 @@ public class DelayShot extends AppCompatActivity
         final Intent intent = getIntent();
         mDeviceName = intent.getStringExtra(EXTRAS_DEVICE_NAME);
         mDeviceAddress = intent.getStringExtra(EXTRAS_DEVICE_ADDRESS);
-        if (DelayShot.max_shot_times == 0)
+        /*if (DelayShot.max_shot_times == 0)
         {
             DelayShot.max_shot_times = 100;
         }
         Log.e(DELAYSHOT_TAG, "max shot time"+ DelayShot.max_shot_times);
+        */
         Calendar c = Calendar.getInstance();
 
         String month = Integer.toString(c.get(Calendar.MONTH));
@@ -470,11 +472,11 @@ public class DelayShot extends AppCompatActivity
                     EtShotTimes.setText("01");
                     Log.e(DELAYSHOT_TAG, "number < 1");
                 }
-                if (number > DelayShot.max_shot_times)
+                if (number > DelayShot.max_shot_times_abpoint)
                 {
-                    Log.e(DELAYSHOT_TAG, "number > DelayShot.max_shot_times"
+                    Log.e(DELAYSHOT_TAG, "number > DelayShot.max_shot_times_abpoint"
                             +number+":"+DelayShot.max_shot_times);
-                    number = DelayShot.max_shot_times;
+                    number = DelayShot.max_shot_times_abpoint;
                     EtShotTimes.setText(""+number);
 
 
@@ -1050,7 +1052,7 @@ public class DelayShot extends AppCompatActivity
                     Log.e(DELAYSHOT_TAG, "Integer.valueOf(tmp_str,16) "+Integer.valueOf(tmp_str,16));
                     StrParam[3] = ""+Integer.valueOf(str.substring(18,20),16) +
                             Integer.valueOf(tmp_str,16);
-                    //DelayShot.max_shot_times = Integer.valueOf(tmp_str,16);
+                    DelayShot.max_shot_times = Integer.valueOf(tmp_str,16);
                     Log.e(DELAYSHOT_TAG, "DelayShot.max_shot_times " + DelayShot.max_shot_times);
                     Log.e(DELAYSHOT_TAG, "StrParam[3] "+StrParam[3]);
                     EtShotTimes.setText(""+StrParam[3]);

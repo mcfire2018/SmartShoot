@@ -55,7 +55,7 @@
                     android:id="@+id/imageButton_left_abpoint"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
-                    android:layout_marginLeft="0dp"
+                    android:layout_marginRight="15dp"
                     android:layout_marginTop="15dp"
                     android:background="@drawable/left"
                     android:scaleType="matrix" />
@@ -71,7 +71,7 @@
                     android:id="@+id/imageButton_right_abpoint"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
-                    android:layout_marginLeft="0dp"
+                    android:layout_marginLeft="15dp"
                     android:layout_marginTop="15dp"
                     android:background="@drawable/right"
                     android:scaleType="matrix" />
