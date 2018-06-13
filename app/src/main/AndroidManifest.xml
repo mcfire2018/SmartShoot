@@ -3,7 +3,9 @@
     package="com.example.sushiyu.smartshot">
     <uses-feature android:name="android.bluetooth.bluetooth_le" android:required="true"/>
     <uses-permission android:name="android.permission.BLUETOOTH" />
-    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <application
         android:versionCode="2"

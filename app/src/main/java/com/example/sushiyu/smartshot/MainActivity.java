@@ -43,6 +43,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -465,10 +466,25 @@ public class MainActivity extends AppCompatActivity
 
             UpdateManager manager = new UpdateManager(MainActivity.this);
             // 检查软件更新
-            manager.checkUpdate();
+            manager.checkUpdate("https://www.baidu.com");
+            /*try{
+                Update.software_update();
+            }
+            catch(Exception e){
+                System.out.println("Wrong!");
+            }*/
+
 
         } else if (id == R.id.support) {
-
+            //UpdateManager manager = new UpdateManager(MainActivity.this);
+            // 检查软件更新
+            //manager.checkUpdate("https://www.sina.com.cn/");
+            //manager.checkUpdate("https://block.sinacloud.com/#/detail/files/version.xml");
+            //manager.checkUpdate("https://github.com/mcfire2018/SmartShoot/blob/master/version.xml");
+            HttpDownloader downloader ;
+            downloader = new HttpDownloader();
+            String urlStr = "https://www.baidu.com";
+            downloader.download(urlStr);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
