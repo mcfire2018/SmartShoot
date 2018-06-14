@@ -553,8 +553,19 @@ public class MainActivity extends AppCompatActivity
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    mDevListAdapter.addDevice(device);
-                    mDevListAdapter.notifyDataSetChanged();
+                    //if ((device.getName().substring(0,2).equals("MI"))||
+                            //(device.getName().substring(0,2).equals("ZY")))
+                    if (device.getName() != null)
+                    {
+                        if ((device.getName().substring(0,3).equals("zy-"))
+                                ||(device.getName().substring(0,3).equals("ZY-")))
+                        {
+                            mDevListAdapter.addDevice(device);
+                            mDevListAdapter.notifyDataSetChanged();
+                        }
+                    }
+
+
                 }
             });
         }
