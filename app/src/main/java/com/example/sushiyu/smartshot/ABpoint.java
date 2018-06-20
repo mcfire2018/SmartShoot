@@ -300,9 +300,8 @@ public class ABpoint extends AppCompatActivity
                     if (str.substring(6,10).equals("030A"))
                     {
                         String shot_maxtime = str.substring(12,14) + str.substring(10,12);
-                        DelayShot.max_shot_times = Integer.valueOf(shot_maxtime,16);
-
-                        Log.e(ABPOINT_TAG, "max shot time"+ DelayShot.max_shot_times);
+                        DelayShot.max_shot_times_abpoint = Integer.valueOf(shot_maxtime,16);
+                        Log.e(ABPOINT_TAG, "max shot time abpoint"+ DelayShot.max_shot_times_abpoint);
                     }
                     if (abpoint_set_flag)
                     {

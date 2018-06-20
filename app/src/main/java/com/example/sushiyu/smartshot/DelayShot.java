@@ -81,6 +81,8 @@ public class DelayShot extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
         setContentView(R.layout.activity_delay_shot);
 
         final Intent intent = getIntent();
@@ -452,35 +454,40 @@ public class DelayShot extends AppCompatActivity
             public void afterTextChanged(Editable editable) {
                 selectionStart = EtShotTimes.getSelectionStart();
                 selectionEnd = EtShotTimes.getSelectionEnd();
-                Log.e(DELAYSHOT_TAG, "abc");
+                Log.e(DELAYSHOT_TAG, "abc step1");
                 if (temp.length() > 5) {
+                    Log.e(DELAYSHOT_TAG, "abc step11 start"+selectionStart+" end "+selectionEnd);
                     editable.delete(selectionStart - 1, selectionEnd);
                     int tempSelection = selectionEnd;
                     EtShotTimes.setText(editable);
                     EtShotTimes.setSelection(tempSelection);
                     Log.e(DELAYSHOT_TAG, "temp.length() > 5");
                 }
-
+                Log.e(DELAYSHOT_TAG, "abc step2");
                 if (editable.length() == 0)
                 {
                     Log.e(DELAYSHOT_TAG, "NULL Editable");
                     return;
                 }
+                Log.e(DELAYSHOT_TAG, "abc step3");
                 int number = Integer.parseInt(editable.toString());
+                Log.e(DELAYSHOT_TAG, "abc step4");
                 if (number < 1)
                 {
                     EtShotTimes.setText("01");
                     Log.e(DELAYSHOT_TAG, "number < 1");
                 }
+                Log.e(DELAYSHOT_TAG, "abc step5");
                 if (number > DelayShot.max_shot_times_abpoint)
                 {
                     Log.e(DELAYSHOT_TAG, "number > DelayShot.max_shot_times_abpoint"
-                            +number+":"+DelayShot.max_shot_times);
+                            +number+":"+DelayShot.max_shot_times_abpoint);
                     number = DelayShot.max_shot_times_abpoint;
                     EtShotTimes.setText(""+number);
 
 
                 }
+                Log.e(DELAYSHOT_TAG, "abc step6");
                 //StrParam[3] = EtShotTimes.getText().toString();
                 StrParam[3] = String.format("%04d", number);
 
@@ -511,7 +518,7 @@ public class DelayShot extends AppCompatActivity
 
                 String shot_time_low = String.format("%04x", number).substring(2,4);
                 String shot_time_high = String.format("%04x", number).substring(0,2);
-
+                Log.e(DELAYSHOT_TAG, "abc step7");
                 tx_string="0093010203"+ shot_time_low + shot_time_high +"00";
                 Log.e(DELAYSHOT_TAG, "tx_string " + tx_string);
                 int total_time,hour,min,sec,tmp;
@@ -532,7 +539,7 @@ public class DelayShot extends AppCompatActivity
                     TvShottimeTotal.setText(String.format("%02d", hour)+":"
                             +String.format("%02d", min)+":"+String.format("%02d", sec));
                 }
-
+                Log.e(DELAYSHOT_TAG, "abc step8");
                 if(!connect_status_bit)
                     return;
                 mBluetoothLeService.txxx(tx_string);
@@ -1050,8 +1057,10 @@ public class DelayShot extends AppCompatActivity
                     tmp_str = str.substring(16,18);
                     Log.e(DELAYSHOT_TAG, "Integer.valueOf(str.substring(18,20),16) "+Integer.valueOf(str.substring(18,20),16));
                     Log.e(DELAYSHOT_TAG, "Integer.valueOf(tmp_str,16) "+Integer.valueOf(tmp_str,16));
-                    StrParam[3] = ""+Integer.valueOf(str.substring(18,20),16) +
-                            Integer.valueOf(tmp_str,16);
+                    Log.e(DELAYSHOT_TAG, "max shoot time integer = "+((Integer.valueOf(str.substring(18,20),16))*256 +
+                            Integer.valueOf(tmp_str,16)));
+                    StrParam[3] = ""+((Integer.valueOf(str.substring(18,20),16))*256 +
+                            Integer.valueOf(tmp_str,16));
                     DelayShot.max_shot_times = Integer.valueOf(tmp_str,16);
                     Log.e(DELAYSHOT_TAG, "DelayShot.max_shot_times " + DelayShot.max_shot_times);
                     Log.e(DELAYSHOT_TAG, "StrParam[3] "+StrParam[3]);
