@@ -308,6 +308,7 @@ public class MainActivity extends AppCompatActivity
                 connect_status_bit=true;
                 delay(3000);
                 Log.e(MAINACTIVITY_TAG, "tx 0093040100000000");
+
                 timer_wait_mcu.schedule(task_wait_mcu, 1, 500);
                 wait_receive_mcu_msg_to = 10;
                 mBluetoothLeService.txxx("0093040100000000");
@@ -544,7 +545,7 @@ public class MainActivity extends AppCompatActivity
                     if (device.getName() != null)
                     {
                         if ((device.getName().substring(0,3).equals("ZY-"))
-                                ||(device.getName().substring(0,3).equals("zy-")))
+                                ||(device.getName().substring(0,3).equals("MLT")))
                         {
                             mDevListAdapter.addDevice(device);
                             mDevListAdapter.notifyDataSetChanged();
