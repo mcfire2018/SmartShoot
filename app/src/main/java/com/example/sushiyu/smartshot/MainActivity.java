@@ -12,7 +12,6 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -45,8 +44,6 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -234,10 +231,10 @@ public class MainActivity extends AppCompatActivity
         @Override
         public void run() {
             wait_receive_mcu_msg_to--;
-            Log.e(MAINACTIVITY_TAG, "task_wait_mcu cnt = "+wait_receive_mcu_msg_to);
+            Log.e(MAINACTIVITY_TAG, "cnt = "+wait_receive_mcu_msg_to);
             if (wait_receive_mcu_msg_to == 0)
             {
-                Log.e(MAINACTIVITY_TAG, " task_wait_mcu 0 cnt = "+wait_receive_mcu_msg_to);
+                Log.e(MAINACTIVITY_TAG, "cnt = "+wait_receive_mcu_msg_to);
                 timer.cancel();
                 timer_wait_mcu.cancel();
 
@@ -425,7 +422,6 @@ public class MainActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
-        Log.e(MAINACTIVITY_TAG, "onCreateOptionsMenu");
         return true;
     }
 
@@ -435,7 +431,7 @@ public class MainActivity extends AppCompatActivity
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        Log.e(MAINACTIVITY_TAG, "onOptionsItemSelected");
+
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
@@ -468,9 +464,27 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.software_upgrade) {
 
+            UpdateManager manager = new UpdateManager(MainActivity.this);
+            // 检查软件更新
+            manager.checkUpdate("https://www.baidu.com");
+            /*try{
+                Update.software_update();
+            }
+            catch(Exception e){
+                System.out.println("Wrong!");
+            }*/
+
 
         } else if (id == R.id.support) {
-
+            //UpdateManager manager = new UpdateManager(MainActivity.this);
+            // 检查软件更新
+            //manager.checkUpdate("https://www.sina.com.cn/");
+            //manager.checkUpdate("https://block.sinacloud.com/#/detail/files/version.xml");
+            //manager.checkUpdate("https://github.com/mcfire2018/SmartShoot/blob/master/version.xml");
+            HttpDownloader downloader ;
+            downloader = new HttpDownloader();
+            String urlStr = "https://www.baidu.com";
+            downloader.download(urlStr);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -543,13 +557,15 @@ public class MainActivity extends AppCompatActivity
                             //(device.getName().substring(0,2).equals("ZY")))
                     if (device.getName() != null)
                     {
-                        if ((device.getName().substring(0,3).equals("ZY-"))
-                                ||(device.getName().substring(0,3).equals("zy-")))
+                        if ((device.getName().substring(0,3).equals("zy-"))
+                                ||(device.getName().substring(0,3).equals("ZY-")))
                         {
                             mDevListAdapter.addDevice(device);
                             mDevListAdapter.notifyDataSetChanged();
                         }
                     }
+
+
                 }
             });
         }

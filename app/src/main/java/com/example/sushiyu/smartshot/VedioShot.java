@@ -69,8 +69,6 @@ public class VedioShot extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        //registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
         setContentView(R.layout.activity_vedio_shot_1);
 
         final Intent intent = getIntent();
