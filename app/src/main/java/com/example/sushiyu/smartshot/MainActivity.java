@@ -64,6 +64,11 @@ public class MainActivity extends AppCompatActivity
     private BluetoothAdapter mBluetoothAdapter;
     private boolean mScanning;
     private Handler mHandler;
+    /*0 for vedio mode key press
+    * 1 for delay mode
+    * 2 for ab point mode*/
+    private int shoot_mode = 0;
+    private int abpoint_ok = 0;
 
     private static final int REQUEST_ENABLE_BT = 1;
     // Stops scanning after 10 seconds.
@@ -86,7 +91,7 @@ public class MainActivity extends AppCompatActivity
     public boolean mConnected = false;
     private Intent connect_intent;
     public  boolean connect_status_bit=false;
-    private int wait_receive_mcu_msg_to;
+    private int wait_receive_mcu_msg_to = 4;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -134,7 +139,7 @@ public class MainActivity extends AppCompatActivity
         mDevListAdapter = new DeviceListAdapter();
 
         lv_bleList.setAdapter(mDevListAdapter);
-
+        lv_bleList.setVisibility(View.VISIBLE);
         lv_bleList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
@@ -143,7 +148,7 @@ public class MainActivity extends AppCompatActivity
                 if (mDevListAdapter.getCount() > 0) {
                     Log.e(MAINACTIVITY_TAG, "i am a bus driver");
 
-                    lv_bleList.setEnabled(false);
+                    lv_bleList.setVisibility(View.INVISIBLE);
                     BluetoothDevice device_select = mDevListAdapter.getItem(position);
                     if (device_select == null) {
                         Log.e(MAINACTIVITY_TAG, "device == null");
@@ -240,14 +245,18 @@ public class MainActivity extends AppCompatActivity
                 Log.e(MAINACTIVITY_TAG, " task_wait_mcu 0 cnt = "+wait_receive_mcu_msg_to);
                 timer.cancel();
                 timer_wait_mcu.cancel();
-
+                if (connect_status_bit) {
+                    Log.e(MAINACTIVITY_TAG, "tx 0093040100000000");
+                    mBluetoothLeService.txxx("0093040100000000");
+                }
+                /*x
                 Intent intent1 = new Intent(MainActivity.this,
                         VedioShot.class);
                 intent1.putExtra(VedioShot.EXTRAS_DEVICE_NAME,
                         mDeviceName);
                 intent1.putExtra(VedioShot.EXTRAS_DEVICE_ADDRESS,
                         mDeviceAddress);
-                startActivity(intent1);
+                startActivity(intent1);*/
             }
         }
     };
@@ -306,17 +315,22 @@ public class MainActivity extends AppCompatActivity
             if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
                 mConnected = true;
                 connect_status_bit=true;
-                delay(3000);
-                Log.e(MAINACTIVITY_TAG, "tx 0093040100000000");
-
+                //delay(3000);
+                Toast.makeText(MainActivity.this, "Connected", Toast.LENGTH_SHORT).show();
+                //Log.e(MAINACTIVITY_TAG, "tx 0093040100000000");
+                //delay(1000);
                 timer_wait_mcu.schedule(task_wait_mcu, 1, 500);
-                wait_receive_mcu_msg_to = 10;
-                mBluetoothLeService.txxx("0093040100000000");
+                wait_receive_mcu_msg_to = 6;
+                //mBluetoothLeService.txxx("0093040100000000");
+                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                drawer.openDrawer(GravityCompat.START);
+                //drawer.setClickable(false);
             } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
                 mConnected = false;
                 mBluetoothLeService.disconnect();
                 mBluetoothLeService = null;
                 timer.cancel();
+                timer_wait_mcu.cancel();
                 timer=null;
                 //updateConnectionState(R.string.disconnected);
                 Intent intent1 = new Intent(MainActivity.this,
@@ -347,20 +361,30 @@ public class MainActivity extends AppCompatActivity
                     intent1.putExtra(MainActivity.EXTRAS_DEVICE_ADDRESS,
                             mDeviceAddress);
                     startActivity(intent1);
+                    return;
                 }
                 else if (str.substring(0,6).equals("030B00") )
                 {
                     Log.e(MAINACTIVITY_TAG, "030B00");
                     timer.cancel();
                     timer_wait_mcu.cancel();
-
+                    Log.e(MAINACTIVITY_TAG, "substring, step1");
                     if (str.substring(6,10).equals("030A"))
                     {
+                        Log.e(MAINACTIVITY_TAG, "substring, step2");
                         String shot_maxtime = str.substring(12,14) + str.substring(10,12);
                         DelayShot.max_shot_times_abpoint = Integer.valueOf(shot_maxtime,16);
 
                         Log.e(MAINACTIVITY_TAG, "max shot time"+ DelayShot.max_shot_times);
                     }
+                    Log.e(MAINACTIVITY_TAG, "substring, step3");
+                    abpoint_ok = 1;
+
+                }
+                /*
+                Log.e(MAINACTIVITY_TAG, "shoot_mode = "+shoot_mode);
+                if (shoot_mode == 0)
+                {
 
                     Intent intent1 = new Intent(MainActivity.this,
                             VedioShot.class);
@@ -370,6 +394,32 @@ public class MainActivity extends AppCompatActivity
                             mDeviceAddress);
                     startActivity(intent1);
                 }
+                else if (shoot_mode == 1)
+                {
+                    Intent intent1 = new Intent(MainActivity.this,
+                            DelayShot.class);
+                    intent1.putExtra(MainActivity.EXTRAS_DEVICE_NAME,
+                            mDeviceName);
+                    intent1.putExtra(MainActivity.EXTRAS_DEVICE_ADDRESS,
+                            mDeviceAddress);
+                    startActivity(intent1);
+                }
+                else if (shoot_mode == 2)
+                {
+                    Intent intent1 = new Intent(MainActivity.this,
+                            ABpoint.class);
+                    intent1.putExtra(MainActivity.EXTRAS_DEVICE_NAME,
+                            mDeviceName);
+                    intent1.putExtra(MainActivity.EXTRAS_DEVICE_ADDRESS,
+                            mDeviceAddress);
+                    startActivity(intent1);
+                }
+                else
+                {
+                    Toast.makeText(MainActivity.this,
+                            "not a regular mode", Toast.LENGTH_SHORT).show();
+                }
+                */
 
                 //displayData(intent.getStringExtra(BluetoothLeService.EXTRA_DATA));
             }
@@ -450,21 +500,42 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
+        if (abpoint_ok == 0)
+        {
+            return true;
+        }
         if (id == R.id.vedio_shoot) {
             timer.cancel();
-            timer_wait_mcu.cancel();
-            Intent intent1 = new Intent(MainActivity.this, VedioShot.class);
+            //timer_wait_mcu.cancel();
+            shoot_mode = 0;
+
+            Intent intent1 = new Intent(MainActivity.this,
+                    VedioShot.class);
+            intent1.putExtra(MainActivity.EXTRAS_DEVICE_NAME,
+                    mDeviceName);
+            intent1.putExtra(MainActivity.EXTRAS_DEVICE_ADDRESS,
+                    mDeviceAddress);
             startActivity(intent1);
 
         } else if (id == R.id.delay_shoot) {
             timer.cancel();
-            timer_wait_mcu.cancel();
-            Intent intent2 = new Intent(MainActivity.this, DelayShot.class);
-            startActivity(intent2);
+            shoot_mode = 1;
+            Intent intent1 = new Intent(MainActivity.this,
+                    VedioShot.class);
+            intent1.putExtra(MainActivity.EXTRAS_DEVICE_NAME,
+                    mDeviceName);
+            intent1.putExtra(MainActivity.EXTRAS_DEVICE_ADDRESS,
+                    mDeviceAddress);
+            startActivity(intent1);
         } else if (id == R.id.abpoint) {
             timer.cancel();
-            timer_wait_mcu.cancel();
-            Intent intent1 = new Intent(MainActivity.this, ABpoint.class);
+            shoot_mode = 2;
+            Intent intent1 = new Intent(MainActivity.this,
+                    VedioShot.class);
+            intent1.putExtra(MainActivity.EXTRAS_DEVICE_NAME,
+                    mDeviceName);
+            intent1.putExtra(MainActivity.EXTRAS_DEVICE_ADDRESS,
+                    mDeviceAddress);
             startActivity(intent1);
 
         } else if (id == R.id.software_upgrade) {
@@ -561,6 +632,7 @@ public class MainActivity extends AppCompatActivity
         super.onResume();
         scanLeDevice(true);
         lv_bleList.setEnabled(true);
+        lv_bleList.setVisibility(View.VISIBLE);
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
     }
 
