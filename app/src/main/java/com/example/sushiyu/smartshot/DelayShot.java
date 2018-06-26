@@ -75,7 +75,7 @@ public class DelayShot extends AppCompatActivity
     private ImageButton delayshot_btn_right;
     private ImageButton delayshot_btn_start;
     private boolean delayshot_start_press_flag = false;
-
+    private boolean get_param_success;
     private String StrParam[] = new String[8];
 
     @Override
@@ -116,7 +116,7 @@ public class DelayShot extends AppCompatActivity
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
         sg = bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
 
-
+        timer.schedule(task, 1000, 1000);
 
         TvShottimeTotal = (TextView) findViewById(R.id.shottime_total);
         TvRemainTimes = (TextView) findViewById(R.id.shot_times_remain);
@@ -932,7 +932,7 @@ public class DelayShot extends AppCompatActivity
             {
                 mConnected = true;
                 connect_status_bit=true;
-                timer.cancel();
+                //timer.cancel();
                 Log.e(DELAYSHOT_TAG, "delayshot connected!");
                 mBluetoothLeService.txxx("0003010200000000");
                 Log.e(DELAYSHOT_TAG, "fuck!!!");
@@ -1118,10 +1118,13 @@ public class DelayShot extends AppCompatActivity
                         TvShottimeTotal.setText(String.format("%02d", hour)+":"
                                 +String.format("%02d", min)+":"+String.format("%02d", sec));
                     }
+                    get_param_success = true;
+                    timer.cancel();
 
                 }
                 else
                 {
+                    get_param_success = false;
                     Log.e(DELAYSHOT_TAG, "not equal to 030Bff");
                 }
 
@@ -1201,6 +1204,14 @@ public class DelayShot extends AppCompatActivity
             Message message = new Message();
             message.what = 1;
             handler.sendMessage(message);
+            if (!get_param_success)
+            {
+                if (connect_status_bit)
+                {
+                    Log.e(DELAYSHOT_TAG, "retry");
+                    mBluetoothLeService.txxx("0003010200000000");
+                }
+            }
         }
     };
 

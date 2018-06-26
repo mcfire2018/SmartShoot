@@ -64,7 +64,7 @@ public class VedioShot extends AppCompatActivity
     private ImageButton img_btn_right;
     private ImageButton img_btn_start;
     private boolean start_press_flag;
-
+    private boolean get_param_success;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -285,7 +285,7 @@ public class VedioShot extends AppCompatActivity
                 {
                     mConnected = true;
                     connect_status_bit=true;
-                    timer.cancel();
+                    //timer.cancel();
                     Log.e(VEDIOSHOT_TAG, "vedioshot connected!");
                     mBluetoothLeService.txxx("0003010100000000");
 
@@ -398,11 +398,13 @@ public class VedioShot extends AppCompatActivity
                         img_btn_start.setBackgroundResource(R.drawable.start);
                         start_press_flag = false;
                     }
-
+                    get_param_success = true;
+                    timer.cancel();
                 }
                 else
                 {
                     Log.e(VEDIOSHOT_TAG, "not equal to 030Bff");
+                    get_param_success = false;
                 }
                 //displayData(intent.getStringExtra(BluetoothLeService.EXTRA_DATA));
             }
@@ -479,6 +481,14 @@ public class VedioShot extends AppCompatActivity
             Message message = new Message();
             message.what = 1;
             handler.sendMessage(message);
+            if (!get_param_success)
+            {
+                if (connect_status_bit)
+                {
+                    Log.e(VEDIOSHOT_TAG, "retry");
+                    mBluetoothLeService.txxx("0003010100000000");
+                }
+            }
         }
     };
 
