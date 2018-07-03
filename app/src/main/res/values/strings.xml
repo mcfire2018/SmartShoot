@@ -63,7 +63,7 @@
     <string name="soft_updating">soft_updating</string>
     <string name="softupdate_progress">softupdate_progress</string>
     <string name="soft_update_cancel">soft_update_cancel</string>
-
+    <string name="title_activity_main2">Main2Activity</string>
 
 
 </resources>

@@ -4,6 +4,7 @@ import android.bluetooth.BluetoothGattService;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
@@ -59,14 +60,9 @@ public class DelayShot extends AppCompatActivity
     private boolean mConnected = false;
     boolean connect_status_bit=false;
     private Handler mHandler;
-
-    private EditText EtHour;
-    private EditText EtMinute;
-    private EditText EtSecond;
     private EditText EtShotTimes;
-    private EditText EtBaoguangHour;
-    private EditText EtBaoguangMin;
-    private EditText EtBaoguangSec;
+    private TextView TvZhugeTime;
+    private TextView TvBaoguangTime;
     private TextView TvShottimeTotal;
     private TextView TvRemainTimes;
     private Switch switch_direction;
@@ -118,313 +114,41 @@ public class DelayShot extends AppCompatActivity
 
         timer.schedule(task, 1000, 1000);
 
+        TvZhugeTime = (TextView) findViewById(R.id.delayshoot_zhuge_tv);
+        TvZhugeTime.setText("00  :  00  :  00");
+        TvZhugeTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DateTimepickerDialog datetimedialog = new DateTimepickerDialog(DelayShot.this,System.currentTimeMillis());
+                datetimedialog.setOnDateTimeSetListener(new DateTimepickerDialog.OnDateTimeSetListener() {
+                    public void OnDateTimeSet(DialogInterface dialog, String datetimestr) {
+                        TvZhugeTime.setText(datetimestr);
+                    }
+                });
+                datetimedialog.show();
+            }
+        });
+
+        TvBaoguangTime = (TextView) findViewById(R.id.delayshoot_baoguang_tv);
+        TvBaoguangTime.setText("00  :  00  :  00");
+        TvBaoguangTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DateTimepickerDialog datetimedialog = new DateTimepickerDialog(DelayShot.this,System.currentTimeMillis());
+                datetimedialog.setOnDateTimeSetListener(new DateTimepickerDialog.OnDateTimeSetListener() {
+                    public void OnDateTimeSet(DialogInterface dialog, String datetimestr) {
+                        TvBaoguangTime.setText(datetimestr);
+                    }
+                });
+                datetimedialog.show();
+            }
+        });
+
+
         TvShottimeTotal = (TextView) findViewById(R.id.shottime_total);
         TvRemainTimes = (TextView) findViewById(R.id.shot_times_remain);
         switch_direction = (Switch) findViewById(R.id.switch2_direction);
         switch_dingdian = (Switch) findViewById(R.id.switch3_dingdian);
-        EtHour = (EditText) findViewById(R.id.delayshot_hour_id);
-        EtHour.setText("00");
-        EtHour.setSelection(EtHour.getText().length());
-        EtHour.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                EtHour.setText(EtHour.getText().toString());// 添加这句后实现效果
-                EtHour.selectAll();
-            }
-        });
-        StrParam[0] = EtHour.getText().toString();
-        EtHour.setOnFocusChangeListener(new View.OnFocusChangeListener(){
-
-            @Override
-            public void onFocusChange(View arg0, boolean hasFocus) {
-                if(hasFocus){
-                    Log.e(DELAYSHOT_TAG, "EtHour has focus");
-
-                }else{
-                    Log.e(DELAYSHOT_TAG, "no focus");
-                    int number = Integer.parseInt(EtHour.getText().toString());
-                    if (number < 10)
-                    {
-                        EtHour.setText("0"+number);
-                    }
-                    Log.e(DELAYSHOT_TAG, "DDD + "+number);
-                    Log.e(DELAYSHOT_TAG, "DDD1");
-                    //StrParam[0] = EtHour.getText().toString();
-                    StrParam[0] = String.format("%02d", number);
-                    Log.e(DELAYSHOT_TAG, "DDD2");
-                    String tx_string;
-                    tx_string="0093010201"+StrParam[2]+StrParam[1]+StrParam[0];
-                    Log.e(DELAYSHOT_TAG, "DDD3");
-                    int total_time,hour,min,sec,tmp;
-                    int PhotoNum;
-                    PhotoNum = Integer.parseInt(StrParam[3]);
-                    Log.e(DELAYSHOT_TAG, "DDD4 "+PhotoNum);
-                    if(PhotoNum < 1)
-                    {
-                        PhotoNum = 1;
-                        Log.e(DELAYSHOT_TAG, "DDD41 "+PhotoNum);
-                    }
-                    total_time = (PhotoNum-1)
-                            * ((Integer.parseInt(StrParam[4]) * 3600 +
-                            Integer.parseInt(StrParam[5]) * 60 +
-                            Integer.parseInt(StrParam[6]))+(Integer.parseInt(StrParam[0]) * 3600 +
-                            Integer.parseInt(StrParam[1]) * 60 +
-                            Integer.parseInt(StrParam[2]))) ;
-                    Log.e(DELAYSHOT_TAG, "DDD5");
-                    tmp = total_time;
-                    hour = tmp / 3600;
-                    tmp -= hour*3600;
-                    min = tmp / 60;
-                    tmp -=min*60;
-                    sec = tmp%60;
-
-                    Log.e(DELAYSHOT_TAG, "EEE");
-                    TvShottimeTotal.setText(String.format("%02d", hour)+":"
-                            +String.format("%02d", min)+":"+String.format("%02d", sec));
-                    if(!connect_status_bit)
-                        return;
-                    Log.e(DELAYSHOT_TAG, "FFF");
-                    mBluetoothLeService.txxx(tx_string);
-                    Log.e(DELAYSHOT_TAG, tx_string);
-                }
-            }
-
-        });
-        EtHour.addTextChangedListener(new TextWatcher() {
-            private CharSequence temp;
-            private int selectionStart;
-            private int selectionEnd;
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                temp = charSequence;
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                String str_second;
-                Log.e(DELAYSHOT_TAG, "EditText Hour Step1+ " + temp.length());
-                selectionStart = EtHour.getSelectionStart();
-                selectionEnd = EtHour.getSelectionEnd();
-                if (temp.length() > 2) {
-                    Log.e(DELAYSHOT_TAG, "EditText Hour, Text Length > 2");
-                    editable.delete(selectionStart - 1, selectionEnd);
-                    int tempSelection = selectionEnd;
-                    str_second = "59";
-                    EtHour.setText(str_second);
-                    EtHour.setSelection(tempSelection);
-                }
-
-                Log.e(DELAYSHOT_TAG, "EditText Hour Step2");
-                if (editable.length() == 0)
-                {
-                    Log.e(DELAYSHOT_TAG, "EditText Hour NULL Editable");
-                    return;
-                }
-                Log.e(DELAYSHOT_TAG, "EditText Hour Step3");
-
-
-                int number = Integer.parseInt(editable.toString());
-                if (number > 59)
-                {
-                    Log.e(DELAYSHOT_TAG, "EtHour larger than 59");
-                    EtHour.setText("59");
-                }
-                Log.e(DELAYSHOT_TAG, "EditText Hour Step4");
-
-            }
-        });
-
-        EtMinute = (EditText) findViewById(R.id.delayshot_minute_id);
-        EtMinute.setText("00");
-        EtMinute.setSelection(EtMinute.getText().length());
-        EtMinute.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                EtMinute.setText(EtMinute.getText().toString());// 添加这句后实现效果
-                EtMinute.selectAll();
-            }
-        });
-        StrParam[1] = EtMinute.getText().toString();
-        EtMinute.setOnFocusChangeListener(new View.OnFocusChangeListener(){
-
-            @Override
-            public void onFocusChange(View arg0, boolean hasFocus) {
-                if(hasFocus){
-                    Log.e(DELAYSHOT_TAG, "EtMinute has focus");
-
-                }else{
-                    Log.e(DELAYSHOT_TAG, "no focus");
-                    int number = Integer.parseInt(EtMinute.getText().toString());
-                    if (number < 10)
-                    {
-                        EtMinute.setText("0"+number);
-                    }
-                    StrParam[1] = String.format("%02d", number);
-                    String tx_string;
-                    tx_string="0093010201"+StrParam[2]+StrParam[1]+StrParam[0];
-                    int total_time,hour,min,sec,tmp;
-                    total_time = (Integer.parseInt(StrParam[3])-1)
-                            * ((Integer.parseInt(StrParam[4]) * 3600 +
-                            Integer.parseInt(StrParam[5]) * 60 +
-                            Integer.parseInt(StrParam[6]))+(Integer.parseInt(StrParam[0]) * 3600 +
-                            Integer.parseInt(StrParam[1]) * 60 +
-                            Integer.parseInt(StrParam[2]))) ;
-                    tmp = total_time;
-                    hour = tmp / 3600;
-                    tmp -= hour*3600;
-                    min = tmp / 60;
-                    tmp -=min*60;
-                    sec = tmp%60;
-                    TvShottimeTotal.setText(String.format("%02d", hour)+":"
-                            +String.format("%02d", min)+":"+String.format("%02d", sec));
-                    if(!connect_status_bit)
-                        return;
-                    mBluetoothLeService.txxx(tx_string);
-                    Log.e(DELAYSHOT_TAG, tx_string);
-                }
-            }
-
-        });
-        EtMinute.addTextChangedListener(new TextWatcher() {
-            private CharSequence temp;
-            private int selectionStart;
-            private int selectionEnd;
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                temp = charSequence;
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                String str_second;
-                selectionStart = EtMinute.getSelectionStart();
-                selectionEnd = EtMinute.getSelectionEnd();
-
-                if (temp.length() > 2) {
-                    editable.delete(selectionStart - 1, selectionEnd);
-                    int tempSelection = selectionEnd;
-                    str_second = "59";
-                    EtMinute.setText(str_second);
-                    EtMinute.setSelection(tempSelection);
-                }
-                Log.e(DELAYSHOT_TAG, "XXX"+editable.toString());
-                //Log.e("delayshot", "H + "+editable.toString());
-                if (editable.length() == 0)
-                {
-                    Log.e(DELAYSHOT_TAG, "NULL Editable");
-                    return;
-                }
-
-                int number = Integer.parseInt(editable.toString());
-                if (number > 59)
-                {
-                    Log.e(DELAYSHOT_TAG, "EtMinute larger than 59");
-                    EtMinute.setText("59");
-                }
-            }
-
-        });
-
-        EtSecond = (EditText) findViewById(R.id.delayshot_second_id);
-        EtSecond.setText("00");
-        EtSecond.setSelection(EtSecond.getText().length());
-        EtSecond.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                EtSecond.setText(EtSecond.getText().toString());// 添加这句后实现效果
-                EtSecond.selectAll();
-            }
-        });
-        StrParam[2] = EtSecond.getText().toString();
-        EtSecond.setOnFocusChangeListener(new View.OnFocusChangeListener(){
-
-            @Override
-            public void onFocusChange(View arg0, boolean hasFocus) {
-                if(hasFocus){
-                    Log.e(DELAYSHOT_TAG, "EtSecond has focus");
-
-                }else{
-                    Log.e(DELAYSHOT_TAG, "no focus");
-                    int number = Integer.parseInt(EtSecond.getText().toString());
-                    if (number < 10)
-                    {
-                        EtSecond.setText("0"+number);
-                    }
-                    //StrParam[2] = EtSecond.getText().toString();
-                    StrParam[2] = String.format("%02d", number);
-
-                    String tx_string;
-                    tx_string="0093010201"+StrParam[2]+StrParam[1]+StrParam[0];
-                    int total_time,hour,min,sec,tmp;
-                    total_time = (Integer.parseInt(StrParam[3])-1)
-                            * ((Integer.parseInt(StrParam[4]) * 3600 +
-                            Integer.parseInt(StrParam[5]) * 60 +
-                            Integer.parseInt(StrParam[6]))+(Integer.parseInt(StrParam[0]) * 3600 +
-                            Integer.parseInt(StrParam[1]) * 60 +
-                            Integer.parseInt(StrParam[2]))) ;
-                    tmp = total_time;
-                    hour = tmp / 3600;
-                    tmp -= hour*3600;
-                    min = tmp / 60;
-                    tmp -=min*60;
-                    sec = tmp%60;
-                    TvShottimeTotal.setText(String.format("%02d", hour)+":"
-                            +String.format("%02d", min)+":"+String.format("%02d", sec));
-                    if(!connect_status_bit)
-                        return;
-                    mBluetoothLeService.txxx(tx_string);
-                    Log.e(DELAYSHOT_TAG, tx_string);
-                }
-            }
-
-        });
-        EtSecond.addTextChangedListener(new TextWatcher() {
-            private CharSequence temp;
-            private int selectionStart;
-            private int selectionEnd;
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                temp = charSequence;
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                String str_second;
-                selectionStart = EtSecond.getSelectionStart();
-                selectionEnd = EtSecond.getSelectionEnd();
-                if (temp.length() > 2) {
-                    editable.delete(selectionStart - 1, selectionEnd);
-                    int tempSelection = selectionEnd;
-                    str_second = "59";
-                    EtSecond.setText(str_second);
-                    EtSecond.setSelection(tempSelection);
-                }
-                if (editable.length() == 0)
-                {
-                    Log.e(DELAYSHOT_TAG, "NULL Editable");
-                    return;
-                }
-                int number = Integer.parseInt(editable.toString());
-                if (number > 59)
-                {
-                    Log.e(DELAYSHOT_TAG, "EtSecond larger than 59");
-                    EtSecond.setText("59");
-                }
-            }
-        });
-
 
         EtShotTimes = (EditText) findViewById(R.id.delayshot_shot_times);
         EtShotTimes.setText("00");
@@ -493,28 +217,6 @@ public class DelayShot extends AppCompatActivity
 
 
                 String tx_string;
-                /*
-                if (number >= 0 && number <0x10)
-                {
-                    tx_string="0093010203000"+ Integer.toHexString(number)+"0000";
-                }
-                else if (number >= 0x10 && number <0x100)
-                {
-                    tx_string="009301020300"+ Integer.toHexString(number)+"0000";
-                }
-                else if (number >= 0x100 && number <0x1000)
-                {
-                    tx_string="00930102030"+ Integer.toHexString(number)+"0000";
-                }
-                else if (number >= 0x1000 && number <0x27f0)
-                {
-                    tx_string="0093010203"+ Integer.toHexString(number)+"0000";
-                }
-                else
-                {
-                    tx_string="";
-                }
-                */
 
                 String shot_time_low = String.format("%04x", number).substring(2,4);
                 String shot_time_high = String.format("%04x", number).substring(0,2);
@@ -545,289 +247,6 @@ public class DelayShot extends AppCompatActivity
                 mBluetoothLeService.txxx(tx_string);
                 Log.e(DELAYSHOT_TAG, tx_string);
                 Log.e(DELAYSHOT_TAG, "AAAAAAAAAAAA");
-
-            }
-        });
-
-        EtBaoguangHour = (EditText) findViewById(R.id.delayshot_baoguang_hour_id);
-        EtBaoguangHour.setText("00");
-        EtBaoguangHour.setSelection(EtBaoguangHour.getText().length());
-        EtBaoguangHour.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                EtBaoguangHour.setText(EtBaoguangHour.getText().toString());// 添加这句后实现效果
-                EtBaoguangHour.selectAll();
-            }
-        });
-        StrParam[4] = EtBaoguangHour.getText().toString();
-        EtBaoguangHour.setOnFocusChangeListener(new View.OnFocusChangeListener(){
-
-            @Override
-            public void onFocusChange(View arg0, boolean hasFocus) {
-                if(hasFocus){
-                    Log.e(DELAYSHOT_TAG, "EtBaoguangHour has focus");
-
-                }else{
-                    Log.e(DELAYSHOT_TAG, "no focus");
-                    int number = Integer.parseInt(EtBaoguangHour.getText().toString());
-                    if (number < 10)
-                    {
-                        EtBaoguangHour.setText("0"+number);
-                    }
-                    //StrParam[4] = EtBaoguangHour.getText().toString();
-                    StrParam[4] = String.format("%02d", number);
-                    String tx_string;
-                    tx_string="0093010202"+StrParam[6]+StrParam[5]+StrParam[4];
-                    int total_time,hour,min,sec,tmp;
-                    total_time = (Integer.parseInt(StrParam[3])-1)
-                            * ((Integer.parseInt(StrParam[4]) * 3600 +
-                            Integer.parseInt(StrParam[5]) * 60 +
-                            Integer.parseInt(StrParam[6]))+(Integer.parseInt(StrParam[0]) * 3600 +
-                            Integer.parseInt(StrParam[1]) * 60 +
-                            Integer.parseInt(StrParam[2]))) ;
-                    tmp = total_time;
-                    hour = tmp / 3600;
-                    tmp -= hour*3600;
-                    min = tmp / 60;
-                    tmp -=min*60;
-                    sec = tmp%60;
-                    TvShottimeTotal.setText(String.format("%02d", hour)+":"
-                            +String.format("%02d", min)+":"+String.format("%02d", sec));
-                    if(!connect_status_bit)
-                        return;
-                    mBluetoothLeService.txxx(tx_string);
-                    Log.e(DELAYSHOT_TAG, tx_string);
-                }
-            }
-
-        });
-        EtBaoguangHour.addTextChangedListener(new TextWatcher() {
-            private CharSequence temp;
-            private int selectionStart;
-            private int selectionEnd;
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                temp = charSequence;
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                String str_second;
-                selectionStart = EtHour.getSelectionStart();
-                selectionEnd = EtHour.getSelectionEnd();
-                Log.e(DELAYSHOT_TAG, "EtBaoguangHour step1");
-                if (temp.length() > 2) {
-                    Log.e(DELAYSHOT_TAG, "EtBaoguangHour temp.length() > 2");
-                    Log.e(DELAYSHOT_TAG, "EtBaoguangHour selectionStart = "+selectionStart);
-                    Log.e(DELAYSHOT_TAG, "EtBaoguangHour selectionEnd = "+selectionEnd);
-                    editable.delete(selectionStart - 1, selectionEnd);
-                    int tempSelection = selectionEnd;
-                    str_second = "59";
-                    EtBaoguangHour.setText(str_second);
-                    EtBaoguangHour.setSelection(tempSelection);
-                }
-                Log.e(DELAYSHOT_TAG, "EtBaoguangHour step2");
-                if (editable.length() == 0)
-                {
-                    Log.e(DELAYSHOT_TAG, "NULL Editable");
-                    return;
-                }
-                int number = Integer.parseInt(editable.toString());
-                Log.e(DELAYSHOT_TAG, "EtBaoguangHour step3 number = "+number);
-                if (number > 59)
-                {
-                    Log.e(DELAYSHOT_TAG, "EtBaoguangHour larger than 59");
-                    EtBaoguangHour.setText("59");
-                }
-                Log.e(DELAYSHOT_TAG, "EtBaoguangHour step4");
-            }
-        });
-
-        EtBaoguangMin = (EditText) findViewById(R.id.delayshot_baoguang_minute_id);
-        EtBaoguangMin.setText("00");
-        EtBaoguangMin.setSelection(EtBaoguangMin.getText().length());
-        EtBaoguangMin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                EtBaoguangMin.setText(EtBaoguangMin.getText().toString());// 添加这句后实现效果
-                EtBaoguangMin.selectAll();
-            }
-        });
-        StrParam[5] = EtBaoguangMin.getText().toString();
-        EtBaoguangMin.setOnFocusChangeListener(new View.OnFocusChangeListener(){
-
-            @Override
-            public void onFocusChange(View arg0, boolean hasFocus) {
-                if(hasFocus){
-                    Log.e(DELAYSHOT_TAG, "EtBaoguangMin has focus");
-
-                }else{
-                    Log.e(DELAYSHOT_TAG, "no focus");
-                    int number = Integer.parseInt(EtBaoguangMin.getText().toString());
-                    if (number < 10)
-                    {
-                        EtBaoguangMin.setText("0"+number);
-                    }
-                    //StrParam[5] = EtBaoguangMin.getText().toString();
-                    StrParam[5] = String.format("%02d", number);
-                    String tx_string;
-                    tx_string="0093010202"+StrParam[6]+StrParam[5]+StrParam[4];
-                    int total_time,hour,min,sec,tmp;
-                    total_time = (Integer.parseInt(StrParam[3])-1)
-                            * ((Integer.parseInt(StrParam[4]) * 3600 +
-                            Integer.parseInt(StrParam[5]) * 60 +
-                            Integer.parseInt(StrParam[6]))+(Integer.parseInt(StrParam[0]) * 3600 +
-                            Integer.parseInt(StrParam[1]) * 60 +
-                            Integer.parseInt(StrParam[2]))) ;
-                    tmp = total_time;
-                    hour = tmp / 3600;
-                    tmp -= hour*3600;
-                    min = tmp / 60;
-                    tmp -=min*60;
-                    sec = tmp%60;
-                    TvShottimeTotal.setText(String.format("%02d", hour)+":"
-                            +String.format("%02d", min)+":"+String.format("%02d", sec));
-                    if(!connect_status_bit)
-                        return;
-                    mBluetoothLeService.txxx(tx_string);
-                    Log.e(DELAYSHOT_TAG, tx_string);
-                }
-            }
-
-        });
-        EtBaoguangMin.addTextChangedListener(new TextWatcher() {
-            private CharSequence temp;
-            private int selectionStart;
-            private int selectionEnd;
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                temp = charSequence;
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                String str_second;
-                selectionStart = EtBaoguangMin.getSelectionStart();
-                selectionEnd = EtBaoguangMin.getSelectionEnd();
-                if (temp.length() > 2) {
-                    Log.e(DELAYSHOT_TAG, "EtBaoguangMin selectionStart = "+selectionStart);
-                    Log.e(DELAYSHOT_TAG, "EtBaoguangMin selectionEnd = "+selectionEnd);
-                    editable.delete(selectionStart - 1, selectionEnd);
-                    int tempSelection = selectionEnd;
-                    str_second = "59";
-                    EtBaoguangMin.setText(str_second);
-                    EtBaoguangMin.setSelection(tempSelection);
-                }
-                if (editable.length() == 0)
-                {
-                    Log.e(DELAYSHOT_TAG, "NULL Editable");
-                    return;
-                }
-                int number = Integer.parseInt(editable.toString());
-                if (number > 59)
-                {
-                    Log.e(DELAYSHOT_TAG, "EtBaoguangMin larger than 59");
-                    EtBaoguangMin.setText("59");
-                }
-            }
-        });
-
-        EtBaoguangSec = (EditText) findViewById(R.id.delayshot_baoguang_second_id);
-        EtBaoguangSec.setText("00");
-        EtBaoguangSec.setSelection(EtBaoguangSec.getText().length());
-        EtBaoguangSec.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                EtBaoguangSec.setText(EtBaoguangSec.getText().toString());// 添加这句后实现效果
-                EtBaoguangSec.selectAll();
-            }
-        });
-        StrParam[6] = EtBaoguangSec.getText().toString();
-        EtBaoguangSec.setOnFocusChangeListener(new View.OnFocusChangeListener(){
-
-            @Override
-            public void onFocusChange(View arg0, boolean hasFocus) {
-                if(hasFocus){
-                    Log.e(DELAYSHOT_TAG, "EtBaoguangSec has focus");
-
-                }else{
-                    Log.e(DELAYSHOT_TAG, "no focus");
-                    int number = Integer.parseInt(EtBaoguangSec.getText().toString());
-                    if (number < 10)
-                    {
-                        EtBaoguangSec.setText("0"+number);
-                    }
-                    //StrParam[6] = EtBaoguangSec.getText().toString();
-                    StrParam[6] = String.format("%02d", number);
-                    String tx_string;
-                    tx_string="0093010202"+StrParam[6]+StrParam[5]+StrParam[4];
-                    int total_time,hour,min,sec,tmp;
-                    total_time = (Integer.parseInt(StrParam[3])-1)
-                            * ((Integer.parseInt(StrParam[4]) * 3600 +
-                            Integer.parseInt(StrParam[5]) * 60 +
-                            Integer.parseInt(StrParam[6]))+(Integer.parseInt(StrParam[0]) * 3600 +
-                            Integer.parseInt(StrParam[1]) * 60 +
-                            Integer.parseInt(StrParam[2]))) ;
-                    tmp = total_time;
-                    hour = tmp / 3600;
-                    tmp -= hour*3600;
-                    min = tmp / 60;
-                    tmp -=min*60;
-                    sec = tmp%60;
-                    TvShottimeTotal.setText(String.format("%02d", hour)+":"
-                            +String.format("%02d", min)+":"+String.format("%02d", sec));
-                    if(!connect_status_bit)
-                        return;
-                    mBluetoothLeService.txxx(tx_string);
-                    Log.e(DELAYSHOT_TAG, tx_string);
-                }
-            }
-
-        });
-        EtBaoguangSec.addTextChangedListener(new TextWatcher() {
-            private CharSequence temp;
-            private int selectionStart;
-            private int selectionEnd;
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                temp = charSequence;
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                String str_second;
-                selectionStart = EtBaoguangSec.getSelectionStart();
-                selectionEnd = EtBaoguangSec.getSelectionEnd();
-                if (temp.length() > 2) {
-                    editable.delete(selectionStart - 1, selectionEnd);
-                    int tempSelection = selectionEnd;
-                    str_second = "59";
-                    EtBaoguangSec.setText(str_second);
-                    EtBaoguangSec.setSelection(tempSelection);
-                }
-                if (editable.length() == 0)
-                {
-                    Log.e(DELAYSHOT_TAG, "NULL Editable");
-                    return;
-                }
-                int number = Integer.parseInt(editable.toString());
-                if (number > 59)
-                {
-                    Log.e(DELAYSHOT_TAG, "EtBaoguangSec larger than 59");
-                    EtBaoguangSec.setText("59");
-                }
 
             }
         });
@@ -1026,32 +445,32 @@ public class DelayShot extends AppCompatActivity
 
                     /*zhuge second*/
                     StrParam[2] = ""+tmp_str;
-                    EtSecond.setText(""+tmp_str);
+                    //EtSecond.setText(""+tmp_str);
                     Log.e(DELAYSHOT_TAG, "zhuge second = "+tmp_str);
                     /*zhuge minute*/
                     tmp_str = str.substring(6,8);
                     StrParam[1] = ""+tmp_str;
-                    EtMinute.setText(""+tmp_str);
+                    //EtMinute.setText(""+tmp_str);
                     Log.e(DELAYSHOT_TAG, "zhuge minute = "+tmp_str);
                     /*zhuge hour*/
                     tmp_str = str.substring(8,10);
                     StrParam[0] = ""+tmp_str;
-                    EtHour.setText(""+tmp_str);
+                    //EtHour.setText(""+tmp_str);
                     Log.e(DELAYSHOT_TAG, "zhuge hour = "+tmp_str);
                     /*baoguang second*/
                     tmp_str = str.substring(10,12);
                     StrParam[6] = ""+tmp_str;
-                    EtBaoguangSec.setText(""+tmp_str);
+                    //EtBaoguangSec.setText(""+tmp_str);
                     Log.e(DELAYSHOT_TAG, "baoguang second = "+tmp_str);
                     /*baoguang minute*/
                     tmp_str = str.substring(12,14);
                     StrParam[5] = ""+tmp_str;
-                    EtBaoguangMin.setText(""+tmp_str);
+                    //EtBaoguangMin.setText(""+tmp_str);
                     Log.e(DELAYSHOT_TAG, "baoguang minute = "+tmp_str);
                     /*baoguang hour*/
                     tmp_str = str.substring(14,16);
                     StrParam[4] = ""+tmp_str;
-                    EtBaoguangHour.setText(""+tmp_str);
+                    //EtBaoguangHour.setText(""+tmp_str);
                     Log.e(DELAYSHOT_TAG, "baoguang hour = "+tmp_str);
                     /*shot maxt time*/
                     tmp_str = str.substring(16,18);
