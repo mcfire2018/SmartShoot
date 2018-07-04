@@ -30,15 +30,6 @@ public class Main2Activity extends AppCompatActivity {
             }
         });
 
-        DateTimepickerDialog datetimedialog = new DateTimepickerDialog(Main2Activity.this,System.currentTimeMillis());
-
-        datetimedialog.setOnDateTimeSetListener(new OnDateTimeSetListener() {
-            public void OnDateTimeSet(DialogInterface dialog, String datetimestr) {
-                timepicker_tv.setText(datetimestr);
-            }
-        });
-        datetimedialog.show();
-
 
     }
 

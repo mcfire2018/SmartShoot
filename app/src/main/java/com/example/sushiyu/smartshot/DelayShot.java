@@ -15,6 +15,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.Time;
@@ -63,6 +64,8 @@ public class DelayShot extends AppCompatActivity
     private EditText EtShotTimes;
     private TextView TvZhugeTime;
     private TextView TvBaoguangTime;
+    private TextView TvShootTimes;
+    private int shoot_times;
     private TextView TvShottimeTotal;
     private TextView TvRemainTimes;
     private Switch switch_direction;
@@ -73,6 +76,12 @@ public class DelayShot extends AppCompatActivity
     private boolean delayshot_start_press_flag = false;
     private boolean get_param_success;
     private String StrParam[] = new String[8];
+    private int zhuge_hour;
+    private int zhuge_minute;
+    private int zhuge_second;
+    private int baoguang_hour;
+    private int baoguang_minute;
+    private int baoguang_second;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,13 +128,31 @@ public class DelayShot extends AppCompatActivity
         TvZhugeTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DateTimepickerDialog datetimedialog = new DateTimepickerDialog(DelayShot.this,System.currentTimeMillis());
+                DateTimepickerDialog datetimedialog =
+                        new DateTimepickerDialog(DelayShot.this, zhuge_hour, zhuge_minute, zhuge_second);
                 datetimedialog.setOnDateTimeSetListener(new DateTimepickerDialog.OnDateTimeSetListener() {
-                    public void OnDateTimeSet(DialogInterface dialog, String datetimestr) {
-                        TvZhugeTime.setText(datetimestr);
+                    public void OnDateTimeSet(DialogInterface dialog, int g_hour, int g_minute, int g_second) {
+                        TvZhugeTime.setText(
+                                String.format("%02d", g_hour)+"  :  "+
+                                String.format("%02d", g_minute)+"  :  "+
+                                String.format("%02d", g_second));
+                        zhuge_hour = g_hour;
+                        zhuge_minute = g_minute;
+                        zhuge_second = g_second;
+                        String tx_string;
+                        tx_string="0093010201"+
+                                String.format("%02x", zhuge_hour)+
+                                String.format("%02x", zhuge_minute)+
+                                String.format("%02x", zhuge_second);
+                        if(!connect_status_bit)
+                            return;
+                        mBluetoothLeService.txxx(tx_string);
+                        Log.e(DELAYSHOT_TAG, tx_string);
                     }
                 });
                 datetimedialog.show();
+
+
             }
         });
 
@@ -134,10 +161,26 @@ public class DelayShot extends AppCompatActivity
         TvBaoguangTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DateTimepickerDialog datetimedialog = new DateTimepickerDialog(DelayShot.this,System.currentTimeMillis());
+                DateTimepickerDialog datetimedialog =
+                        new DateTimepickerDialog(DelayShot.this,baoguang_hour, baoguang_minute, baoguang_second);
                 datetimedialog.setOnDateTimeSetListener(new DateTimepickerDialog.OnDateTimeSetListener() {
-                    public void OnDateTimeSet(DialogInterface dialog, String datetimestr) {
-                        TvBaoguangTime.setText(datetimestr);
+                    public void OnDateTimeSet(DialogInterface dialog, int g_hour, int g_minute, int g_second) {
+                        TvBaoguangTime.setText(
+                                String.format("%02d", g_hour)+"  :  "+
+                                String.format("%02d", g_minute)+"  :  "+
+                                String.format("%02d", g_second));
+                        baoguang_hour = g_hour;
+                        baoguang_minute = g_minute;
+                        baoguang_second = g_second;
+                        String tx_string;
+                        tx_string="0093010202"+
+                                String.format("%02x", baoguang_hour)+
+                                String.format("%02x", baoguang_minute)+
+                                String.format("%02x", baoguang_second);
+                        if(!connect_status_bit)
+                            return;
+                        mBluetoothLeService.txxx(tx_string);
+                        Log.e(DELAYSHOT_TAG, tx_string);
                     }
                 });
                 datetimedialog.show();
@@ -145,111 +188,67 @@ public class DelayShot extends AppCompatActivity
         });
 
 
+        TvShootTimes = (TextView) findViewById(R.id.shoot_times);
+        TvShootTimes.setText("00");
+        TvShootTimes.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                EtShotTimes = new EditText(DelayShot.this);
+                EtShotTimes.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                    }
+                    @Override
+                    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                    }
+                    @Override
+                    public void afterTextChanged(Editable editable) {
+                        shoot_times = Integer.valueOf(editable.toString(),10);
+                        Log.e(DELAYSHOT_TAG, "EtShotTimes afterTextChanged "+shoot_times);
+                    }
+                });
+                AlertDialog dialog = new AlertDialog.Builder(DelayShot.this)
+                        .setTitle("拍摄张数")
+                        .setView(EtShotTimes)
+                        //.setView(new EditText(DelayShot.this))
+                        .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                            }
+                        })
+                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Log.e(DELAYSHOT_TAG, "TvShootTimes onClick");
+
+
+                                String tx_string;
+                                String str_shoot_times_high;
+                                String str_shoot_times_low;
+
+                                str_shoot_times_high = String.format("%02x", (shoot_times / 256));
+                                str_shoot_times_low = String.format("%02x", (shoot_times % 256));
+                                tx_string="0093010203"+str_shoot_times_low + str_shoot_times_high+"00";
+                                TvShootTimes.setText(""+shoot_times);
+                                if(!connect_status_bit)
+                                    return;
+                                mBluetoothLeService.txxx(tx_string);
+                                Log.e(DELAYSHOT_TAG, tx_string);
+
+                            }
+                        })
+                        .create();
+                dialog.show();
+
+            }
+        });
+
         TvShottimeTotal = (TextView) findViewById(R.id.shottime_total);
         TvRemainTimes = (TextView) findViewById(R.id.shot_times_remain);
         switch_direction = (Switch) findViewById(R.id.switch2_direction);
         switch_dingdian = (Switch) findViewById(R.id.switch3_dingdian);
 
-        EtShotTimes = (EditText) findViewById(R.id.delayshot_shot_times);
-        EtShotTimes.setText("00");
-        EtShotTimes.setSelection(EtShotTimes.getText().length());
-        EtShotTimes.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                EtShotTimes.setText(EtShotTimes.getText().toString());// 添加这句后实现效果
-                EtShotTimes.selectAll();
-            }
-        });
-        StrParam[3] = EtShotTimes.getText().toString();
-        EtShotTimes.addTextChangedListener(new TextWatcher() {
-            private CharSequence temp;
-            private int selectionStart;
-            private int selectionEnd;
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
 
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                temp = charSequence;
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                selectionStart = EtShotTimes.getSelectionStart();
-                selectionEnd = EtShotTimes.getSelectionEnd();
-                Log.e(DELAYSHOT_TAG, "abc step1");
-                if (temp.length() > 5) {
-                    Log.e(DELAYSHOT_TAG, "abc step11 start"+selectionStart+" end "+selectionEnd);
-                    editable.delete(selectionStart - 1, selectionEnd);
-                    int tempSelection = selectionEnd;
-                    EtShotTimes.setText(editable);
-                    EtShotTimes.setSelection(tempSelection);
-                    Log.e(DELAYSHOT_TAG, "temp.length() > 5");
-                }
-                Log.e(DELAYSHOT_TAG, "abc step2");
-                if (editable.length() == 0)
-                {
-                    Log.e(DELAYSHOT_TAG, "NULL Editable");
-                    return;
-                }
-                Log.e(DELAYSHOT_TAG, "abc step3");
-                int number = Integer.parseInt(editable.toString());
-                Log.e(DELAYSHOT_TAG, "abc step4");
-                if (number < 1)
-                {
-                    EtShotTimes.setText("01");
-                    Log.e(DELAYSHOT_TAG, "number < 1");
-                }
-                Log.e(DELAYSHOT_TAG, "abc step5");
-                if (number > DelayShot.max_shot_times_abpoint)
-                {
-                    Log.e(DELAYSHOT_TAG, "number > DelayShot.max_shot_times_abpoint"
-                            +number+":"+DelayShot.max_shot_times_abpoint);
-                    number = DelayShot.max_shot_times_abpoint;
-                    EtShotTimes.setText(""+number);
-
-
-                }
-                Log.e(DELAYSHOT_TAG, "abc step6");
-                //StrParam[3] = EtShotTimes.getText().toString();
-                StrParam[3] = String.format("%04d", number);
-
-
-                String tx_string;
-
-                String shot_time_low = String.format("%04x", number).substring(2,4);
-                String shot_time_high = String.format("%04x", number).substring(0,2);
-                Log.e(DELAYSHOT_TAG, "abc step7");
-                tx_string="0093010203"+ shot_time_low + shot_time_high +"00";
-                Log.e(DELAYSHOT_TAG, "tx_string " + tx_string);
-                int total_time,hour,min,sec,tmp;
-                total_time = (Integer.parseInt(StrParam[3])-1)
-                        * ((Integer.parseInt(StrParam[4]) * 3600 +
-                        Integer.parseInt(StrParam[5]) * 60 +
-                        Integer.parseInt(StrParam[6]))+(Integer.parseInt(StrParam[0]) * 3600 +
-                        Integer.parseInt(StrParam[1]) * 60 +
-                        Integer.parseInt(StrParam[2]))) ;
-                tmp = total_time;
-                hour = tmp / 3600;
-                tmp -= hour*3600;
-                min = tmp / 60;
-                tmp -=min*60;
-                sec = tmp%60;
-                if (total_time >= 0)
-                {
-                    TvShottimeTotal.setText(String.format("%02d", hour)+":"
-                            +String.format("%02d", min)+":"+String.format("%02d", sec));
-                }
-                Log.e(DELAYSHOT_TAG, "abc step8");
-                if(!connect_status_bit)
-                    return;
-                mBluetoothLeService.txxx(tx_string);
-                Log.e(DELAYSHOT_TAG, tx_string);
-                Log.e(DELAYSHOT_TAG, "AAAAAAAAAAAA");
-
-            }
-        });
 
         switch_direction.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -295,7 +294,6 @@ public class DelayShot extends AppCompatActivity
 
 
         delayshot_btn_start = (ImageButton) findViewById(R.id.img_btn_delayshot_start);
-        //delayshot_btn_start.setBackgroundResource(R.drawable.stop);
         delayshot_btn_start.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -315,7 +313,6 @@ public class DelayShot extends AppCompatActivity
                     }else{
                         delayshot_btn_start.setBackgroundResource(R.drawable.start);
                         delayshot_start_press_flag = true;
-                        //send_msg_to_mcu();
 
                         String tx_string;
                         tx_string="0093010206000000";
@@ -354,7 +351,6 @@ public class DelayShot extends AppCompatActivity
                 //timer.cancel();
                 Log.e(DELAYSHOT_TAG, "delayshot connected!");
                 mBluetoothLeService.txxx("0003010200000000");
-                Log.e(DELAYSHOT_TAG, "fuck!!!");
                 delay(20);
 
             }
@@ -422,6 +418,11 @@ public class DelayShot extends AppCompatActivity
                 if (str.substring(0,4).equals("0309"))
                 {
                     Log.e(DELAYSHOT_TAG, "hello");
+					if (str.length() != 10)
+					{
+						Log.e(DELAYSHOT_TAG, "string size not equal to 10");
+						return;
+					}
                     int remain_times = Integer.valueOf(str.substring(4,6),16);
                     /*
                     if (remain_times == DelayShot.max_shot_times)
@@ -440,50 +441,69 @@ public class DelayShot extends AppCompatActivity
 
                 if (str.substring(0,4).equals("0302"))
                 {
+
+					if (str.length() != 28)
+					{
+						Log.e(DELAYSHOT_TAG, "string size not equal to 28");
+						return;
+					}
+
+					
                     String tmp_str = str.substring(4,6);
-
-
                     /*zhuge second*/
-                    StrParam[2] = ""+tmp_str;
+                    zhuge_second = Integer.valueOf(tmp_str,16);
                     //EtSecond.setText(""+tmp_str);
                     Log.e(DELAYSHOT_TAG, "zhuge second = "+tmp_str);
                     /*zhuge minute*/
                     tmp_str = str.substring(6,8);
-                    StrParam[1] = ""+tmp_str;
+                    zhuge_minute = Integer.valueOf(tmp_str,16);
                     //EtMinute.setText(""+tmp_str);
                     Log.e(DELAYSHOT_TAG, "zhuge minute = "+tmp_str);
                     /*zhuge hour*/
                     tmp_str = str.substring(8,10);
-                    StrParam[0] = ""+tmp_str;
+					zhuge_hour = Integer.valueOf(tmp_str,16);
                     //EtHour.setText(""+tmp_str);
                     Log.e(DELAYSHOT_TAG, "zhuge hour = "+tmp_str);
+
+                    TvZhugeTime.setText(
+                            String.format("%02d", zhuge_hour)+"  :  "+
+                                    String.format("%02d", zhuge_minute)+"  :  "+
+                                    String.format("%02d", zhuge_second));
                     /*baoguang second*/
                     tmp_str = str.substring(10,12);
-                    StrParam[6] = ""+tmp_str;
+                    baoguang_second = Integer.valueOf(tmp_str,16);
                     //EtBaoguangSec.setText(""+tmp_str);
                     Log.e(DELAYSHOT_TAG, "baoguang second = "+tmp_str);
                     /*baoguang minute*/
                     tmp_str = str.substring(12,14);
-                    StrParam[5] = ""+tmp_str;
+                    baoguang_minute = Integer.valueOf(tmp_str,16);
                     //EtBaoguangMin.setText(""+tmp_str);
                     Log.e(DELAYSHOT_TAG, "baoguang minute = "+tmp_str);
                     /*baoguang hour*/
                     tmp_str = str.substring(14,16);
-                    StrParam[4] = ""+tmp_str;
+                    baoguang_hour = Integer.valueOf(tmp_str,16);
                     //EtBaoguangHour.setText(""+tmp_str);
                     Log.e(DELAYSHOT_TAG, "baoguang hour = "+tmp_str);
+
+					TvBaoguangTime.setText(
+                                String.format("%02d", baoguang_hour)+"  :  "+
+                                String.format("%02d", baoguang_minute)+"  :  "+
+                                String.format("%02d", baoguang_second));
                     /*shot maxt time*/
                     tmp_str = str.substring(16,18);
                     Log.e(DELAYSHOT_TAG, "Integer.valueOf(str.substring(18,20),16) "+Integer.valueOf(str.substring(18,20),16));
                     Log.e(DELAYSHOT_TAG, "Integer.valueOf(tmp_str,16) "+Integer.valueOf(tmp_str,16));
                     Log.e(DELAYSHOT_TAG, "max shoot time integer = "+((Integer.valueOf(str.substring(18,20),16))*256 +
                             Integer.valueOf(tmp_str,16)));
-                    StrParam[3] = ""+((Integer.valueOf(str.substring(18,20),16))*256 +
-                            Integer.valueOf(tmp_str,16));
-                    DelayShot.max_shot_times = Integer.valueOf(tmp_str,16);
+                    /*StrParam[3] = ((Integer.valueOf(str.substring(18,20),16))*256 +
+                            Integer.valueOf(tmp_str,16));*/
+                    shoot_times = (Integer.valueOf(str.substring(18,20),16))*256 +
+                            Integer.valueOf(tmp_str,16);
+                    DelayShot.max_shot_times = shoot_times;
                     Log.e(DELAYSHOT_TAG, "DelayShot.max_shot_times " + DelayShot.max_shot_times);
-                    Log.e(DELAYSHOT_TAG, "StrParam[3] "+StrParam[3]);
-                    EtShotTimes.setText(""+StrParam[3]);
+                    Log.e(DELAYSHOT_TAG, "shoot_times = "+shoot_times);
+                    TvShootTimes.setText(""+shoot_times);
+                    Log.e(DELAYSHOT_TAG, "after shoot_times = "+shoot_times);
                     /*auto back*/
                     tmp_str = str.substring(20,22);
                     Log.e(DELAYSHOT_TAG, "auto back = "+tmp_str);
@@ -512,12 +532,9 @@ public class DelayShot extends AppCompatActivity
                     }
 
                     int total_time,hour,min,sec,tmp;
-                    total_time = (Integer.parseInt(StrParam[3])-1)
-                            * ((Integer.parseInt(StrParam[4]) * 3600 +
-                            Integer.parseInt(StrParam[5]) * 60 +
-                            Integer.parseInt(StrParam[6]))+(Integer.parseInt(StrParam[0]) * 3600 +
-                            Integer.parseInt(StrParam[1]) * 60 +
-                            Integer.parseInt(StrParam[2]))) ;
+                    total_time = (shoot_times - 1)
+                            * ((baoguang_hour * 3600 + baoguang_minute * 60 + baoguang_second)+
+                            (zhuge_hour * 3600 + zhuge_minute * 60 + zhuge_second)) ;
                     tmp = total_time;
                     hour = tmp / 3600;
                     tmp -= hour*3600;
@@ -525,13 +542,13 @@ public class DelayShot extends AppCompatActivity
                     tmp -=min*60;
                     sec = tmp%60;
                     Log.e(DELAYSHOT_TAG, "total_time "+total_time);
-                    Log.e(DELAYSHOT_TAG, "StrParam[0] "+StrParam[0]);
-                    Log.e(DELAYSHOT_TAG, "StrParam[1] "+StrParam[1]);
-                    Log.e(DELAYSHOT_TAG, "StrParam[2] "+StrParam[2]);
-                    Log.e(DELAYSHOT_TAG, "StrParam[3] "+StrParam[3]);
-                    Log.e(DELAYSHOT_TAG, "StrParam[4] "+StrParam[4]);
-                    Log.e(DELAYSHOT_TAG, "StrParam[5] "+StrParam[5]);
-                    Log.e(DELAYSHOT_TAG, "StrParam[6] "+StrParam[6]);
+                    Log.e(DELAYSHOT_TAG, "zhuge_hour "+zhuge_hour);
+                    Log.e(DELAYSHOT_TAG, "zhuge_minute "+zhuge_minute);
+                    Log.e(DELAYSHOT_TAG, "zhuge_second "+zhuge_second);
+                    Log.e(DELAYSHOT_TAG, "baoguang_hour "+baoguang_hour);
+                    Log.e(DELAYSHOT_TAG, "baoguang_minute "+baoguang_minute);
+                    Log.e(DELAYSHOT_TAG, "baoguang_second "+baoguang_second);
+                    Log.e(DELAYSHOT_TAG, "shoot_times "+shoot_times);
                     if(total_time >= 0)
                     {
                         TvShottimeTotal.setText(String.format("%02d", hour)+":"

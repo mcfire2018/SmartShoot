@@ -121,19 +121,15 @@
             android:text="@string/delayshot_shottime_total"
             android:textSize="20sp" />
 
-        <EditText
-            android:id="@+id/delayshot_shot_times"
+        <TextView
+            android:id="@+id/shoot_times"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="false"
             android:layout_marginLeft="0dp"
-            android:ems="5"
+            android:layout_marginTop="10dp"
             android:gravity="center_horizontal"
-            android:hint="00"
-            android:inputType="phone"
-            android:padding="1dp"
-            android:selectAllOnFocus="true"
-            android:textSize="17sp" />
+            android:text=""
+            android:textSize="20sp" />
 
     </LinearLayout>
 

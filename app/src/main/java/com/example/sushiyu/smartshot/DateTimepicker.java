@@ -23,8 +23,12 @@ public class DateTimepicker extends FrameLayout {
     private int mYear, mMonth, mDay, mHour, mMinute, mSecond;
     private OnDateTimeChangedListener mOnDateTimeChangedListener;
 
-    public DateTimepicker(Context context) {
+    public DateTimepicker(Context context, int hour, int minute, int second) {
         super(context);
+
+        mHour = hour;
+        mMinute = minute;
+        mSecond = second;
         /*
         mDate = Calendar.getInstance();
         mYear = mDate.get(Calendar.YEAR);

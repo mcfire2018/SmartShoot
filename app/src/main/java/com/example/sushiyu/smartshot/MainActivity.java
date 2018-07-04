@@ -1,5 +1,6 @@
 package com.example.sushiyu.smartshot;
 
+import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGattService;
@@ -13,12 +14,18 @@ import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
+import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -56,6 +63,8 @@ import java.util.TimerTask;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
 
+    private static final int REQUEST_CODE_LOCATION_SETTINGS = 2;
+    private static final int REQUEST_CODE_ACCESS_COARSE_LOCATION = 1;
     public static final String EXTRAS_DEVICE_NAME = "DEVICE_NAME";
     public static final String EXTRAS_DEVICE_ADDRESS = "DEVICE_ADDRESS";
     public static final String MAINACTIVITY_TAG = "mcfire_main";
@@ -91,7 +100,8 @@ public class MainActivity extends AppCompatActivity
     public boolean mConnected = false;
     private Intent connect_intent;
     public  boolean connect_status_bit=false;
-    private int wait_receive_mcu_msg_to = 4;
+    private int wait_receive_mcu_msg_to = 6;
+    private int timeout_flag = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,6 +139,31 @@ public class MainActivity extends AppCompatActivity
             Intent mIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(mIntent, 1);
         }
+
+
+        //TODO
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {//如果 API level 是大于等于 23(Android 6.0) 时
+            //判断是否具有权限
+            if (ContextCompat.checkSelfPermission(this,
+                    Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                //判断是否需要向用户解释为什么需要申请该权限
+                if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                        Manifest.permission.ACCESS_COARSE_LOCATION)) {
+                    Toast.makeText(this, "自Android 6.0开始需要打开位置权限才可以搜索到Ble设备", Toast.LENGTH_SHORT).show();
+                }
+                //请求权限
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                        REQUEST_CODE_ACCESS_COARSE_LOCATION);
+            }
+
+            Boolean haha =isLocationEnable(this);
+            if (!haha){
+                setLocationService();
+            }
+        }
+
+
 
         bt_device_test = new ArrayList<BluetoothDevice>();
         //bt_device_test = mBluetoothAdapter.getBondedDevices();
@@ -246,8 +281,10 @@ public class MainActivity extends AppCompatActivity
                 timer.cancel();
                 timer_wait_mcu.cancel();
                 if (connect_status_bit) {
+                    timeout_flag = 1;
                     Log.e(MAINACTIVITY_TAG, "tx 0093040100000000");
                     mBluetoothLeService.txxx("0093040100000000");
+
                 }
                 /*x
                 Intent intent1 = new Intent(MainActivity.this,
@@ -315,15 +352,15 @@ public class MainActivity extends AppCompatActivity
             if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
                 mConnected = true;
                 connect_status_bit=true;
+                Log.e(MAINACTIVITY_TAG, "LLL");
                 //delay(3000);
-                Toast.makeText(MainActivity.this, "Connected", Toast.LENGTH_SHORT).show();
                 //Log.e(MAINACTIVITY_TAG, "tx 0093040100000000");
                 //delay(1000);
                 timer_wait_mcu.schedule(task_wait_mcu, 1, 500);
                 wait_receive_mcu_msg_to = 6;
                 //mBluetoothLeService.txxx("0093040100000000");
-                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-                drawer.openDrawer(GravityCompat.START);
+
+
                 //drawer.setClickable(false);
             } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
                 mConnected = false;
@@ -348,6 +385,9 @@ public class MainActivity extends AppCompatActivity
             } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                 String str = intent.getStringExtra(BluetoothLeService.EXTRA_DATA);
                 Log.e(MAINACTIVITY_TAG, "PPP"+ str);
+                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                drawer.openDrawer(GravityCompat.START);
+                Toast.makeText(MainActivity.this, "Connected", Toast.LENGTH_SHORT).show();
                 if (str.equals("030BFF") )
                 {
                     Log.e(MAINACTIVITY_TAG, "ready to enter AB Point Setting");
@@ -736,5 +776,36 @@ public class MainActivity extends AppCompatActivity
             sb.append(digital[bit]);
         }
         return sb.toString();
+    }
+
+    //TODO 执行完上面的请求权限后，系统会弹出提示框让用户选择是否允许改权限。选择的结果可以在回到接口中得知：
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == REQUEST_CODE_ACCESS_COARSE_LOCATION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                //用户允许改权限，0表示允许，-1表示拒绝 PERMISSION_GRANTED = 0， PERMISSION_DENIED = -1
+                //permission was granted, yay! Do the contacts-related task you need to do.
+                //这里进行授权被允许的处理
+            } else {
+                //permission denied, boo! Disable the functionality that depends on this permission.
+                //这里进行权限被拒绝的处理
+            }
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
+
+    //判断定位
+    public static final boolean isLocationEnable(Context context) {
+        LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        boolean networkProvider = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        boolean gpsProvider = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        if (networkProvider || gpsProvider) return true;
+        return false;
+    }
+
+    private void setLocationService() {
+        Intent locationIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+        this.startActivityForResult(locationIntent, REQUEST_CODE_LOCATION_SETTINGS);
     }
 }

@@ -12,10 +12,14 @@ public class DateTimepickerDialog extends AlertDialog  {
 	private int Hour,Minute,Second;
 	private OnDateTimeSetListener mOnDateTimeSetListener;
 	private String datetimeStr;
-	public DateTimepickerDialog(Context context, long date) {
+	public DateTimepickerDialog(Context context, int s_hour, int s_minute, int s_second) {
 		super(context);
-		mDateTimePicker = new DateTimepicker(context);
+        Hour = s_hour;
+        Minute = s_minute;
+        Second = s_second;
+		mDateTimePicker = new DateTimepicker(context, Hour, Minute, Second);
 		setView(mDateTimePicker);//装载刚才建立的布局，把定义好的日期时间布局显示在这个自定义对话框上
+
 		/* 
 		 *实现DateTimepicker里的接口
 		 */  
@@ -37,7 +41,7 @@ public class DateTimepickerDialog extends AlertDialog  {
 						String.format("%02d", Minute)+"  :  "+
 						String.format("%02d", Second);
 				if (mOnDateTimeSetListener != null) {
-					mOnDateTimeSetListener.OnDateTimeSet(dialog, datetimeStr);
+					mOnDateTimeSetListener.OnDateTimeSet(dialog, Hour, Minute, Second);
 					}
 				}
 			}); 
@@ -49,7 +53,7 @@ public class DateTimepickerDialog extends AlertDialog  {
 	 *接口回调
 	 */  
 	public interface OnDateTimeSetListener {  
-		void OnDateTimeSet(DialogInterface dialog, String datetimestr);
+		void OnDateTimeSet(DialogInterface dialog, int hour, int minute, int second);
 	}  
   
  
