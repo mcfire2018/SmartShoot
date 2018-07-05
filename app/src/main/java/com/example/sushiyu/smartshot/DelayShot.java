@@ -17,6 +17,8 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
+import android.text.InputFilter;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.text.format.Time;
 import android.util.Log;
@@ -141,9 +143,9 @@ public class DelayShot extends AppCompatActivity
                         zhuge_second = g_second;
                         String tx_string;
                         tx_string="0093010201"+
-                                String.format("%02x", zhuge_hour)+
+                                String.format("%02x", zhuge_second)+
                                 String.format("%02x", zhuge_minute)+
-                                String.format("%02x", zhuge_second);
+                                String.format("%02x", zhuge_hour);
                         if(!connect_status_bit)
                             return;
                         mBluetoothLeService.txxx(tx_string);
@@ -174,9 +176,9 @@ public class DelayShot extends AppCompatActivity
                         baoguang_second = g_second;
                         String tx_string;
                         tx_string="0093010202"+
-                                String.format("%02x", baoguang_hour)+
+                                String.format("%02x", baoguang_second)+
                                 String.format("%02x", baoguang_minute)+
-                                String.format("%02x", baoguang_second);
+                                String.format("%02x", baoguang_hour);
                         if(!connect_status_bit)
                             return;
                         mBluetoothLeService.txxx(tx_string);
@@ -194,6 +196,7 @@ public class DelayShot extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 EtShotTimes = new EditText(DelayShot.this);
+                EtShotTimes.setInputType(InputType.TYPE_CLASS_NUMBER);
                 EtShotTimes.addTextChangedListener(new TextWatcher() {
                     @Override
                     public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -204,6 +207,11 @@ public class DelayShot extends AppCompatActivity
                     @Override
                     public void afterTextChanged(Editable editable) {
                         shoot_times = Integer.valueOf(editable.toString(),10);
+                        if (shoot_times > 65535)
+                        {
+                            shoot_times = 65535;
+                            EtShotTimes.setText(""+shoot_times);
+                        }
                         Log.e(DELAYSHOT_TAG, "EtShotTimes afterTextChanged "+shoot_times);
                     }
                 });

@@ -385,8 +385,7 @@ public class MainActivity extends AppCompatActivity
             } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                 String str = intent.getStringExtra(BluetoothLeService.EXTRA_DATA);
                 Log.e(MAINACTIVITY_TAG, "PPP"+ str);
-                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-                drawer.openDrawer(GravityCompat.START);
+
                 Toast.makeText(MainActivity.this, "Connected", Toast.LENGTH_SHORT).show();
                 if (str.equals("030BFF") )
                 {
@@ -408,6 +407,8 @@ public class MainActivity extends AppCompatActivity
                     Log.e(MAINACTIVITY_TAG, "030B00");
                     timer.cancel();
                     timer_wait_mcu.cancel();
+                    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                    drawer.openDrawer(GravityCompat.START);
                     Log.e(MAINACTIVITY_TAG, "substring, step1");
                     if (str.substring(6,10).equals("030A"))
                     {
@@ -561,7 +562,7 @@ public class MainActivity extends AppCompatActivity
             timer.cancel();
             shoot_mode = 1;
             Intent intent1 = new Intent(MainActivity.this,
-                    VedioShot.class);
+                    DelayShot.class);
             intent1.putExtra(MainActivity.EXTRAS_DEVICE_NAME,
                     mDeviceName);
             intent1.putExtra(MainActivity.EXTRAS_DEVICE_ADDRESS,
@@ -681,6 +682,19 @@ public class MainActivity extends AppCompatActivity
         super.onPause();
         scanLeDevice(false);
         unregisterReceiver(mGattUpdateReceiver);
+    }
+
+    @Override
+    protected void onDestroy() {
+        Log.e(MAINACTIVITY_TAG, "MainActivity onDestroy");
+        super.onDestroy();
+        mBluetoothLeService.disconnect();
+        unbindService(mServiceConnection);
+        mBluetoothLeService = null;
+        timer.cancel();
+        timer_wait_mcu.cancel();
+        timer=null;
+        timer_wait_mcu = null;
     }
 
 
