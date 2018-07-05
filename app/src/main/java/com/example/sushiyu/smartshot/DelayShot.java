@@ -206,6 +206,12 @@ public class DelayShot extends AppCompatActivity
                     }
                     @Override
                     public void afterTextChanged(Editable editable) {
+                        Log.e(DELAYSHOT_TAG, "EtShotTimes afterTextChanged "+editable.toString()+"a");
+                        if (editable.toString().equals(""))
+                        {
+                            shoot_times = 0;
+                            return;
+                        }
                         shoot_times = Integer.valueOf(editable.toString(),10);
                         if (shoot_times > 65535)
                         {
@@ -426,12 +432,16 @@ public class DelayShot extends AppCompatActivity
                 if (str.substring(0,4).equals("0309"))
                 {
                     Log.e(DELAYSHOT_TAG, "hello");
-					if (str.length() != 10)
+					if (str.length() != 14)
 					{
 						Log.e(DELAYSHOT_TAG, "string size not equal to 10");
 						return;
 					}
-                    int remain_times = Integer.valueOf(str.substring(4,6),16);
+                    int remain_times_low = Integer.valueOf(str.substring(4,6),16);
+                    int remain_times_high = Integer.valueOf(str.substring(6,8),16);
+                    int total_shoot_second = Integer.valueOf(str.substring(8,10),16);
+                    int total_shoot_minute = Integer.valueOf(str.substring(10,12),16);
+                    int total_shoot_hour = Integer.valueOf(str.substring(12,14),16);
                     /*
                     if (remain_times == DelayShot.max_shot_times)
                     {
@@ -444,7 +454,9 @@ public class DelayShot extends AppCompatActivity
                             delayshot_start_press_flag = true;
                         }
                     }*/
-                    TvRemainTimes.setText(""+remain_times);
+                    TvRemainTimes.setText(""+(remain_times_high*256+remain_times_low));
+                    TvShottimeTotal.setText(String.format("%02d", total_shoot_hour)+":"
+                            +String.format("%02d", total_shoot_minute)+":"+String.format("%02d", total_shoot_second));
                 }
 
                 if (str.substring(0,4).equals("0302"))
@@ -538,7 +550,7 @@ public class DelayShot extends AppCompatActivity
                         delayshot_btn_start.setBackgroundResource(R.drawable.start);
                         delayshot_start_press_flag = true;
                     }
-
+                    /*
                     int total_time,hour,min,sec,tmp;
                     total_time = (shoot_times - 1)
                             * ((baoguang_hour * 3600 + baoguang_minute * 60 + baoguang_second)+
@@ -562,6 +574,7 @@ public class DelayShot extends AppCompatActivity
                         TvShottimeTotal.setText(String.format("%02d", hour)+":"
                                 +String.format("%02d", min)+":"+String.format("%02d", sec));
                     }
+                    */
                     get_param_success = true;
                     timer.cancel();
 

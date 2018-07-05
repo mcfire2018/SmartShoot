@@ -100,8 +100,9 @@ public class MainActivity extends AppCompatActivity
     public boolean mConnected = false;
     private Intent connect_intent;
     public  boolean connect_status_bit=false;
-    private int wait_receive_mcu_msg_to = 6;
+    private int wait_receive_mcu_msg_to = 26;
     private int timeout_flag = 0;
+    private boolean get_param_success;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -275,16 +276,21 @@ public class MainActivity extends AppCompatActivity
         public void run() {
             wait_receive_mcu_msg_to--;
             Log.e(MAINACTIVITY_TAG, "task_wait_mcu cnt = "+wait_receive_mcu_msg_to);
-            if (wait_receive_mcu_msg_to == 0)
+            if (wait_receive_mcu_msg_to < 21)
             {
                 Log.e(MAINACTIVITY_TAG, " task_wait_mcu 0 cnt = "+wait_receive_mcu_msg_to);
-                timer.cancel();
-                timer_wait_mcu.cancel();
-                if (connect_status_bit) {
-                    timeout_flag = 1;
-                    Log.e(MAINACTIVITY_TAG, "tx 0093040100000000");
-                    mBluetoothLeService.txxx("0093040100000000");
 
+                if (connect_status_bit) {
+                    if (!get_param_success)
+                    {
+                        Log.e(MAINACTIVITY_TAG, "tx 0093040100000000");
+                        mBluetoothLeService.txxx("0093040100000000");
+                    }else
+                    {
+                        wait_receive_mcu_msg_to = 26;
+                        timer.cancel();
+                        timer_wait_mcu.cancel();
+                    }
                 }
                 /*x
                 Intent intent1 = new Intent(MainActivity.this,
@@ -357,7 +363,7 @@ public class MainActivity extends AppCompatActivity
                 //Log.e(MAINACTIVITY_TAG, "tx 0093040100000000");
                 //delay(1000);
                 timer_wait_mcu.schedule(task_wait_mcu, 1, 500);
-                wait_receive_mcu_msg_to = 6;
+                wait_receive_mcu_msg_to = 26;
                 //mBluetoothLeService.txxx("0093040100000000");
 
 
@@ -387,12 +393,12 @@ public class MainActivity extends AppCompatActivity
                 Log.e(MAINACTIVITY_TAG, "PPP"+ str);
 
                 Toast.makeText(MainActivity.this, "Connected", Toast.LENGTH_SHORT).show();
-                if (str.equals("030BFF") )
+                if (str.substring(0,6).equals("030BFF") )
                 {
                     Log.e(MAINACTIVITY_TAG, "ready to enter AB Point Setting");
                     timer.cancel();
                     timer_wait_mcu.cancel();
-
+                    get_param_success = true;
                     Intent intent1 = new Intent(MainActivity.this,
                             ABpoint.class);
                     intent1.putExtra(MainActivity.EXTRAS_DEVICE_NAME,
@@ -407,6 +413,7 @@ public class MainActivity extends AppCompatActivity
                     Log.e(MAINACTIVITY_TAG, "030B00");
                     timer.cancel();
                     timer_wait_mcu.cancel();
+                    get_param_success = true;
                     DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
                     drawer.openDrawer(GravityCompat.START);
                     Log.e(MAINACTIVITY_TAG, "substring, step1");

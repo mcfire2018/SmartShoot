@@ -318,7 +318,7 @@ public class ABpoint extends AppCompatActivity
                     }
 
                 }
-                else if (str.equals("030C00"))
+                else if (str.substring(0, 6).equals("030C00"))
                 {
                     Log.e(ABPOINT_TAG, "BBB");
                     img_btn_start_abpoint.setVisibility(View.VISIBLE);
