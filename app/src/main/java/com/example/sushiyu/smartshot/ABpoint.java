@@ -294,15 +294,21 @@ public class ABpoint extends AppCompatActivity
                 String str = intent.getStringExtra(BluetoothLeService.EXTRA_DATA);
                 Log.e(ABPOINT_TAG, "PPP"+ str);
                 //030CFF 030A1234
+
+                if (str.length() < 6)
+                {
+                    Log.e(ABPOINT_TAG, "ABPoint str less than 6, return, str = "+str);
+                    return;
+                }
                 if (str.substring(0,6).equals("030CFF"))
                 {
                     Log.e(ABPOINT_TAG, "skip");
-                    if (str.substring(6,10).equals("030A"))
+                    /*if (str.substring(6,10).equals("030A"))
                     {
                         String shot_maxtime = str.substring(12,14) + str.substring(10,12);
                         DelayShot.max_shot_times_abpoint = Integer.valueOf(shot_maxtime,16);
                         Log.e(ABPOINT_TAG, "max shot time abpoint"+ DelayShot.max_shot_times_abpoint);
-                    }
+                    }*/
                     if (abpoint_set_flag)
                     {
                         Log.e(ABPOINT_TAG, "AAA");

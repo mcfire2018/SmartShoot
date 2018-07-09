@@ -407,8 +407,9 @@ public class DelayShot extends AppCompatActivity
             if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
                 mConnected = true;
                 connect_status_bit=true;
-                Log.e(DELAYSHOT_TAG, "delayshot ACTION_GATT_CONNECTED");
+                Log.e(DELAYSHOT_TAG, "ACTION_GATT_CONNECTED");
             } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
+                Log.e(DELAYSHOT_TAG, "ACTION_GATT_DISCONNECTED");
                 connect_status_bit=true;
                 mConnected = true;
                 mBluetoothLeService.disconnect();
@@ -421,20 +422,23 @@ public class DelayShot extends AppCompatActivity
                 startActivity(intent1);
                 connect_status_bit=false;
             } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
-                Log.e(DELAYSHOT_TAG, "delayshot service discovered");
+                Log.e(DELAYSHOT_TAG, "ACTION_GATT_SERVICES_DISCOVERED");
                 // Show all the supported services and characteristics on the user interface.
                 displayGattServices(mBluetoothLeService.getSupportedGattServices());
             } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
-                Log.e(DELAYSHOT_TAG, "delayshot received data");
                 String str = intent.getStringExtra(BluetoothLeService.EXTRA_DATA);
-                Log.e(DELAYSHOT_TAG, "str"+str);
-                Log.e(DELAYSHOT_TAG, "substr"+str.substring(0,4));
+                if (str.length() < 4)
+                {
+                    Log.e(DELAYSHOT_TAG, "Received Data Length Error(<4), Data : "+str);
+                    return;
+                }
+                Log.e(DELAYSHOT_TAG, "Receive Data : "+str);
                 if (str.substring(0,4).equals("0309"))
                 {
-                    Log.e(DELAYSHOT_TAG, "hello");
+                    Log.e(DELAYSHOT_TAG, "Shoot Count(0309) Header Check OK");
 					if (str.length() != 14)
 					{
-						Log.e(DELAYSHOT_TAG, "string size not equal to 10");
+                        Log.e(DELAYSHOT_TAG, "Shoot Count(0309) PayLoad Length Check ERR("+str.length()+")");
 						return;
 					}
                     int remain_times_low = Integer.valueOf(str.substring(4,6),16);
@@ -442,18 +446,6 @@ public class DelayShot extends AppCompatActivity
                     int total_shoot_second = Integer.valueOf(str.substring(8,10),16);
                     int total_shoot_minute = Integer.valueOf(str.substring(10,12),16);
                     int total_shoot_hour = Integer.valueOf(str.substring(12,14),16);
-                    /*
-                    if (remain_times == DelayShot.max_shot_times)
-                    {
-                        if (delayshot_start_press_flag) {
-                            delayshot_btn_start.setBackgroundResource(R.drawable.start);
-                            delayshot_start_press_flag = false;
-
-                        }else{
-                            delayshot_btn_start.setBackgroundResource(R.drawable.stop);
-                            delayshot_start_press_flag = true;
-                        }
-                    }*/
                     TvRemainTimes.setText(""+(remain_times_high*256+remain_times_low));
                     TvShottimeTotal.setText(String.format("%02d", total_shoot_hour)+":"
                             +String.format("%02d", total_shoot_minute)+":"+String.format("%02d", total_shoot_second));
@@ -461,10 +453,10 @@ public class DelayShot extends AppCompatActivity
 
                 if (str.substring(0,4).equals("0302"))
                 {
-
+                    Log.e(DELAYSHOT_TAG, "DelayShoot Params(0302) Header Check OK");
 					if (str.length() != 28)
 					{
-						Log.e(DELAYSHOT_TAG, "string size not equal to 28");
+                        Log.e(DELAYSHOT_TAG, "DelayShoot Params(0302) PayLoad Length Check ERR("+str.length()+")");
 						return;
 					}
 
@@ -511,8 +503,8 @@ public class DelayShot extends AppCompatActivity
                                 String.format("%02d", baoguang_second));
                     /*shot maxt time*/
                     tmp_str = str.substring(16,18);
-                    Log.e(DELAYSHOT_TAG, "Integer.valueOf(str.substring(18,20),16) "+Integer.valueOf(str.substring(18,20),16));
-                    Log.e(DELAYSHOT_TAG, "Integer.valueOf(tmp_str,16) "+Integer.valueOf(tmp_str,16));
+                    //Log.e(DELAYSHOT_TAG, "Integer.valueOf(str.substring(18,20),16) "+Integer.valueOf(str.substring(18,20),16));
+                    //Log.e(DELAYSHOT_TAG, "Integer.valueOf(tmp_str,16) "+Integer.valueOf(tmp_str,16));
                     Log.e(DELAYSHOT_TAG, "max shoot time integer = "+((Integer.valueOf(str.substring(18,20),16))*256 +
                             Integer.valueOf(tmp_str,16)));
                     /*StrParam[3] = ((Integer.valueOf(str.substring(18,20),16))*256 +
@@ -521,9 +513,8 @@ public class DelayShot extends AppCompatActivity
                             Integer.valueOf(tmp_str,16);
                     DelayShot.max_shot_times = shoot_times;
                     Log.e(DELAYSHOT_TAG, "DelayShot.max_shot_times " + DelayShot.max_shot_times);
-                    Log.e(DELAYSHOT_TAG, "shoot_times = "+shoot_times);
                     TvShootTimes.setText(""+shoot_times);
-                    Log.e(DELAYSHOT_TAG, "after shoot_times = "+shoot_times);
+                    Log.e(DELAYSHOT_TAG, "shoot_times = "+shoot_times);
                     /*auto back*/
                     tmp_str = str.substring(20,22);
                     Log.e(DELAYSHOT_TAG, "auto back = "+tmp_str);
@@ -550,31 +541,6 @@ public class DelayShot extends AppCompatActivity
                         delayshot_btn_start.setBackgroundResource(R.drawable.start);
                         delayshot_start_press_flag = true;
                     }
-                    /*
-                    int total_time,hour,min,sec,tmp;
-                    total_time = (shoot_times - 1)
-                            * ((baoguang_hour * 3600 + baoguang_minute * 60 + baoguang_second)+
-                            (zhuge_hour * 3600 + zhuge_minute * 60 + zhuge_second)) ;
-                    tmp = total_time;
-                    hour = tmp / 3600;
-                    tmp -= hour*3600;
-                    min = tmp / 60;
-                    tmp -=min*60;
-                    sec = tmp%60;
-                    Log.e(DELAYSHOT_TAG, "total_time "+total_time);
-                    Log.e(DELAYSHOT_TAG, "zhuge_hour "+zhuge_hour);
-                    Log.e(DELAYSHOT_TAG, "zhuge_minute "+zhuge_minute);
-                    Log.e(DELAYSHOT_TAG, "zhuge_second "+zhuge_second);
-                    Log.e(DELAYSHOT_TAG, "baoguang_hour "+baoguang_hour);
-                    Log.e(DELAYSHOT_TAG, "baoguang_minute "+baoguang_minute);
-                    Log.e(DELAYSHOT_TAG, "baoguang_second "+baoguang_second);
-                    Log.e(DELAYSHOT_TAG, "shoot_times "+shoot_times);
-                    if(total_time >= 0)
-                    {
-                        TvShottimeTotal.setText(String.format("%02d", hour)+":"
-                                +String.format("%02d", min)+":"+String.format("%02d", sec));
-                    }
-                    */
                     get_param_success = true;
                     timer.cancel();
 
@@ -582,7 +548,7 @@ public class DelayShot extends AppCompatActivity
                 else
                 {
                     get_param_success = false;
-                    Log.e(DELAYSHOT_TAG, "not equal to 030Bff");
+                    Log.e(DELAYSHOT_TAG, "DelayShoot Params(0302) Header Check ERR "+str.substring(0,4));
                 }
 
                 //displayData(intent.getStringExtra(BluetoothLeService.EXTRA_DATA));

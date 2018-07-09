@@ -393,6 +393,12 @@ public class MainActivity extends AppCompatActivity
                 Log.e(MAINACTIVITY_TAG, "PPP"+ str);
 
                 Toast.makeText(MainActivity.this, "Connected", Toast.LENGTH_SHORT).show();
+
+                if (str.length() < 6)
+                {
+                    Log.e(MAINACTIVITY_TAG, "MainActivity str less than 6, return, str = "+str);
+                    return;
+                }
                 if (str.substring(0,6).equals("030BFF") )
                 {
                     Log.e(MAINACTIVITY_TAG, "ready to enter AB Point Setting");
@@ -417,6 +423,7 @@ public class MainActivity extends AppCompatActivity
                     DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
                     drawer.openDrawer(GravityCompat.START);
                     Log.e(MAINACTIVITY_TAG, "substring, step1");
+                    /*
                     if (str.substring(6,10).equals("030A"))
                     {
                         Log.e(MAINACTIVITY_TAG, "substring, step2");
@@ -424,7 +431,7 @@ public class MainActivity extends AppCompatActivity
                         DelayShot.max_shot_times_abpoint = Integer.valueOf(shot_maxtime,16);
 
                         Log.e(MAINACTIVITY_TAG, "max shot time"+ DelayShot.max_shot_times);
-                    }
+                    }*/
                     Log.e(MAINACTIVITY_TAG, "substring, step3");
                     abpoint_ok = 1;
 

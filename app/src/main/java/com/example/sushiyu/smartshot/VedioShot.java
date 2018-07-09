@@ -271,7 +271,7 @@ public class VedioShot extends AppCompatActivity
 
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder service) {
-            Log.e(VEDIOSHOT_TAG, "vedioshot onServiceConnected");
+            Log.e(VEDIOSHOT_TAG, "VedioShoot onServiceConnected");
             mBluetoothLeService = ((BluetoothLeService.LocalBinder) service).getService();
             if (!mBluetoothLeService.initialize()) {
                 Log.e(VEDIOSHOT_TAG, "Unable to initialize Bluetooth");
@@ -280,13 +280,13 @@ public class VedioShot extends AppCompatActivity
             {
                 boolean result;
                 result = mBluetoothLeService.connect(mDeviceAddress);
-                Log.e(VEDIOSHOT_TAG, "vedioshot result "+result);
+                Log.e(VEDIOSHOT_TAG, "VedioShoot Connect Result "+result);
                 if (result)
                 {
                     mConnected = true;
                     connect_status_bit=true;
                     //timer.cancel();
-                    Log.e(VEDIOSHOT_TAG, "vedioshot connected!");
+                    Log.e(VEDIOSHOT_TAG, "VedioShoot Connect!");
                     mBluetoothLeService.txxx("0003010100000000");
 
                 }
@@ -304,14 +304,14 @@ public class VedioShot extends AppCompatActivity
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
             connect_intent = intent;
-            Log.e(VEDIOSHOT_TAG, "vedioshot_123");
             if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
+                Log.e(VEDIOSHOT_TAG, "ACTION_GATT_CONNECTED");
                 mConnected = true;
                 connect_status_bit=true;
-                Log.e(VEDIOSHOT_TAG, "delayshot ACTION_GATT_CONNECTED");
                 //delay(3000);
                 //mBluetoothLeService.txxx("0093040100000000");
             } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
+                Log.e(VEDIOSHOT_TAG, "ACTION_GATT_DISCONNECTED");
                 mConnected = false;
                 mBluetoothLeService.disconnect();
                 mBluetoothLeService = null;
@@ -321,17 +321,22 @@ public class VedioShot extends AppCompatActivity
                         MainActivity.class);
                 startActivity(intent1);
                 connect_status_bit=false;
-                Log.e(VEDIOSHOT_TAG, "MMM");
+
                 //show_view(false);
                 //invalidateOptionsMenu();
                 //clearUI();
             } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
-                Log.e(VEDIOSHOT_TAG, "OOO");
+                Log.e(VEDIOSHOT_TAG, "ACTION_GATT_SERVICES_DISCOVERED");
                 // Show all the supported services and characteristics on the user interface.
                 displayGattServices(mBluetoothLeService.getSupportedGattServices());
             } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                 String str = intent.getStringExtra(BluetoothLeService.EXTRA_DATA);
-                Log.e(VEDIOSHOT_TAG, "PPP"+ str);
+                Log.e(VEDIOSHOT_TAG, "Receive Data : "+str);
+                if (str.length() < 4)
+                {
+                    Log.e(VEDIOSHOT_TAG, "vedio shoot str less than 4, return, str = "+str);
+                    return;
+                }
                 //03015001020304
                 if (str.substring(0,4).equals("0301"))
                 {
@@ -632,7 +637,7 @@ public class VedioShot extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-        Log.e(VEDIOSHOT_TAG, "GGG");
+        Log.e(VEDIOSHOT_TAG, "onResume");
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
         if (mBluetoothLeService != null) {
 
@@ -643,7 +648,7 @@ public class VedioShot extends AppCompatActivity
 
     @Override
     protected void onPause() {
-        Log.e(VEDIOSHOT_TAG, "HHH");
+        Log.e(VEDIOSHOT_TAG, "onPause");
         super.onPause();
         unregisterReceiver(mGattUpdateReceiver);
     }
