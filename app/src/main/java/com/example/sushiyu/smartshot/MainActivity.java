@@ -182,7 +182,7 @@ public class MainActivity extends AppCompatActivity
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
                 if (mDevListAdapter.getCount() > 0) {
-                    Log.e(MAINACTIVITY_TAG, "i am a bus driver");
+                    Log.e(MAINACTIVITY_TAG, "BLE List Item Click");
 
                     lv_bleList.setVisibility(View.INVISIBLE);
                     BluetoothDevice device_select = mDevListAdapter.getItem(position);
@@ -190,6 +190,7 @@ public class MainActivity extends AppCompatActivity
                         Log.e(MAINACTIVITY_TAG, "device == null");
                         return;
                     }
+                    Toast.makeText(MainActivity.this, R.string.Connecting, Toast.LENGTH_SHORT).show();
                     /*
                     Log.e(MAINACTIVITY_TAG, device_select.getName());
                     Log.e(MAINACTIVITY_TAG, device_select.getAddress());
@@ -354,11 +355,11 @@ public class MainActivity extends AppCompatActivity
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
             connect_intent = intent;
-            Log.e(MAINACTIVITY_TAG, "KKK");
+            Log.e(MAINACTIVITY_TAG, "BroadcastReceiver");
             if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
                 mConnected = true;
                 connect_status_bit=true;
-                Log.e(MAINACTIVITY_TAG, "LLL");
+                Log.e(MAINACTIVITY_TAG, "ACTION_GATT_CONNECTED");
                 //delay(3000);
                 //Log.e(MAINACTIVITY_TAG, "tx 0093040100000000");
                 //delay(1000);
@@ -380,19 +381,19 @@ public class MainActivity extends AppCompatActivity
                         MainActivity.class);
                 startActivity(intent1);
                 connect_status_bit=false;
-                Log.e(MAINACTIVITY_TAG, "MMM");
+                Log.e(MAINACTIVITY_TAG, "ACTION_GATT_DISCONNECTED");
                 //show_view(false);
                 //invalidateOptionsMenu();
                 //clearUI();
             } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
-                Log.e(MAINACTIVITY_TAG, "OOO");
+                Log.e(MAINACTIVITY_TAG, "ACTION_GATT_SERVICES_DISCOVERED");
                 // Show all the supported services and characteristics on the user interface.
                 displayGattServices(mBluetoothLeService.getSupportedGattServices());
             } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                 String str = intent.getStringExtra(BluetoothLeService.EXTRA_DATA);
-                Log.e(MAINACTIVITY_TAG, "PPP"+ str);
+                Log.e(MAINACTIVITY_TAG, "Receive Data : "+ str);
 
-                Toast.makeText(MainActivity.this, "Connected", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, R.string.Connected, Toast.LENGTH_SHORT).show();
 
                 if (str.length() < 6)
                 {
@@ -401,7 +402,7 @@ public class MainActivity extends AppCompatActivity
                 }
                 if (str.substring(0,6).equals("030BFF") )
                 {
-                    Log.e(MAINACTIVITY_TAG, "ready to enter AB Point Setting");
+                    Log.e(MAINACTIVITY_TAG, "Ready To Enter AB Point Setting");
                     timer.cancel();
                     timer_wait_mcu.cancel();
                     get_param_success = true;
@@ -422,17 +423,6 @@ public class MainActivity extends AppCompatActivity
                     get_param_success = true;
                     DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
                     drawer.openDrawer(GravityCompat.START);
-                    Log.e(MAINACTIVITY_TAG, "substring, step1");
-                    /*
-                    if (str.substring(6,10).equals("030A"))
-                    {
-                        Log.e(MAINACTIVITY_TAG, "substring, step2");
-                        String shot_maxtime = str.substring(12,14) + str.substring(10,12);
-                        DelayShot.max_shot_times_abpoint = Integer.valueOf(shot_maxtime,16);
-
-                        Log.e(MAINACTIVITY_TAG, "max shot time"+ DelayShot.max_shot_times);
-                    }*/
-                    Log.e(MAINACTIVITY_TAG, "substring, step3");
                     abpoint_ok = 1;
 
                 }

@@ -56,4 +56,6 @@
     <string name="software_upgrade">software upgrade</string>
     <string name="support">support：596400303@qq.com</string>
     <string name="abpoint_reset">Reset</string>
+    <string name="Connecting">Connecting</string>
+    <string name="Connected">Connected</string>
 </resources>

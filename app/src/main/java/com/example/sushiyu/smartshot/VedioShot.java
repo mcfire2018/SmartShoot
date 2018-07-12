@@ -113,13 +113,20 @@ public class VedioShot extends AppCompatActivity
                     img_btn_left.setBackgroundResource(R.drawable.left_press);
                     img_btn_right.setBackgroundResource(R.drawable.right_release);
                     String tx_string;
-                    tx_string="0093010102ff0000";
+                    tx_string="0093010102ffff00";
                     if (!connect_status_bit)
                         return false;
                     mBluetoothLeService.txxx(tx_string);
                     Log.e(VEDIOSHOT_TAG, tx_string);
                 }else if(motionEvent.getAction() == MotionEvent.ACTION_UP){
-
+                    img_btn_left.setBackgroundResource(R.drawable.left_release);
+                    img_btn_right.setBackgroundResource(R.drawable.right_release);
+                    String tx_string;
+                    tx_string="0093010102ff0000";
+                    if (!connect_status_bit)
+                        return false;
+                    mBluetoothLeService.txxx(tx_string);
+                    Log.e(VEDIOSHOT_TAG, tx_string);
                 }
                 return false;
             }
@@ -133,13 +140,20 @@ public class VedioShot extends AppCompatActivity
                     img_btn_left.setBackgroundResource(R.drawable.left_release);
                     img_btn_right.setBackgroundResource(R.drawable.right_press);
                     String tx_string;
-                    tx_string="0093010102000000";
+                    tx_string="009301010200ff00";
                     if (!connect_status_bit)
                         return false;
                     mBluetoothLeService.txxx(tx_string);
                     Log.e(VEDIOSHOT_TAG, tx_string);
                 }else if(motionEvent.getAction() == MotionEvent.ACTION_UP){
-
+                    img_btn_left.setBackgroundResource(R.drawable.left_release);
+                    img_btn_right.setBackgroundResource(R.drawable.right_release);
+                    String tx_string;
+                    tx_string="0093010102000000";
+                    if (!connect_status_bit)
+                        return false;
+                    mBluetoothLeService.txxx(tx_string);
+                    Log.e(VEDIOSHOT_TAG, tx_string);
                 }
                 return false;
             }

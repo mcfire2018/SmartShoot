@@ -47,7 +47,7 @@
     <string name="title_activity_delay_shot">延时拍摄</string>
     <string name="language">语言</string>
     <string name="Reverse">自动往返</string>
-    <string name="Manual">定点拍摄</string>
+    <string name="Manual">单拍</string>
     <string name="Speed">当前速度：</string>
     <string name="Close">关</string>
     <string name="Open">开</string>
@@ -64,6 +64,8 @@
     <string name="softupdate_progress">softupdate_progress</string>
     <string name="soft_update_cancel">soft_update_cancel</string>
     <string name="title_activity_main2">Main2Activity</string>
+    <string name="Connecting">正在连接......</string>
+    <string name="Connected">连接成功</string>
 
 
 </resources>
