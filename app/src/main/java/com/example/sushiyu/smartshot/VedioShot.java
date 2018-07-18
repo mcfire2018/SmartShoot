@@ -351,6 +351,18 @@ public class VedioShot extends AppCompatActivity
                     Log.e(VEDIOSHOT_TAG, "vedio shoot str less than 4, return, str = "+str);
                     return;
                 }
+                if (str.substring(0,6).equals("030BFF") )
+                {
+                    Log.e(VEDIOSHOT_TAG, "Ready To Enter AB Point Setting");
+                    Intent intent1 = new Intent(VedioShot.this,
+                            ABpoint.class);
+                    intent1.putExtra(VedioShot.EXTRAS_DEVICE_NAME,
+                            mDeviceName);
+                    intent1.putExtra(VedioShot.EXTRAS_DEVICE_ADDRESS,
+                            mDeviceAddress);
+                    startActivity(intent1);
+                    return;
+                }
                 //03015001020304
                 if (str.substring(0,4).equals("0301"))
                 {

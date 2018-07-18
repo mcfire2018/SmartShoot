@@ -190,7 +190,7 @@ public class MainActivity extends AppCompatActivity
                         Log.e(MAINACTIVITY_TAG, "device == null");
                         return;
                     }
-                    Toast.makeText(MainActivity.this, R.string.Connecting, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, R.string.Connecting, Toast.LENGTH_LONG).show();
                     /*
                     Log.e(MAINACTIVITY_TAG, device_select.getName());
                     Log.e(MAINACTIVITY_TAG, device_select.getAddress());

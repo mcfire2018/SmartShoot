@@ -433,6 +433,19 @@ public class DelayShot extends AppCompatActivity
                     return;
                 }
                 Log.e(DELAYSHOT_TAG, "Receive Data : "+str);
+
+                if (str.substring(0,6).equals("030BFF") )
+                {
+                    Log.e(DELAYSHOT_TAG, "Ready To Enter AB Point Setting");
+                    Intent intent1 = new Intent(DelayShot.this,
+                            ABpoint.class);
+                    intent1.putExtra(DelayShot.EXTRAS_DEVICE_NAME,
+                            mDeviceName);
+                    intent1.putExtra(DelayShot.EXTRAS_DEVICE_ADDRESS,
+                            mDeviceAddress);
+                    startActivity(intent1);
+                    return;
+                }
                 if (str.substring(0,4).equals("0309"))
                 {
                     Log.e(DELAYSHOT_TAG, "Shoot Count(0309) Header Check OK");
@@ -449,6 +462,7 @@ public class DelayShot extends AppCompatActivity
                     TvRemainTimes.setText(""+(remain_times_high*256+remain_times_low));
                     TvShottimeTotal.setText(String.format("%02d", total_shoot_hour)+":"
                             +String.format("%02d", total_shoot_minute)+":"+String.format("%02d", total_shoot_second));
+
                 }
 
                 if (str.substring(0,4).equals("0302"))
@@ -774,6 +788,7 @@ public class DelayShot extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         Log.e(DELAYSHOT_TAG, "delayshot onResume");
+
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
         if (mBluetoothLeService != null) {
 
@@ -786,7 +801,7 @@ public class DelayShot extends AppCompatActivity
     protected void onPause() {
         Log.e(DELAYSHOT_TAG, "delayshot onPause");
         super.onPause();
-        unregisterReceiver(mGattUpdateReceiver);
+        //unregisterReceiver(mGattUpdateReceiver);
     }
 
     @Override
@@ -798,6 +813,7 @@ public class DelayShot extends AppCompatActivity
         mBluetoothLeService = null;
         timer.cancel();
         timer=null;
+        unregisterReceiver(mGattUpdateReceiver);
     }
 
 
