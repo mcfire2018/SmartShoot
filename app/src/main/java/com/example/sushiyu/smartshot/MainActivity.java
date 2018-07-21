@@ -277,7 +277,7 @@ public class MainActivity extends AppCompatActivity
         public void run() {
             wait_receive_mcu_msg_to--;
             Log.e(MAINACTIVITY_TAG, "task_wait_mcu cnt = "+wait_receive_mcu_msg_to);
-            if (wait_receive_mcu_msg_to < 21)
+            if (wait_receive_mcu_msg_to < 19)
             {
                 Log.e(MAINACTIVITY_TAG, " task_wait_mcu 0 cnt = "+wait_receive_mcu_msg_to);
 
