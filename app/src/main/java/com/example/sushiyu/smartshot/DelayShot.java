@@ -356,9 +356,9 @@ public class DelayShot extends AppCompatActivity
                 finish();
             }
             boolean result;
-            result = mBluetoothLeService.connect(mDeviceAddress);
-            Log.e(DELAYSHOT_TAG, "delayshot result "+result);
-            if (result)
+            //result = mBluetoothLeService.connect(mDeviceAddress);
+            //Log.e(DELAYSHOT_TAG, "delayshot result "+result);
+            //if (result)
             {
                 mConnected = true;
                 connect_status_bit=true;
@@ -412,7 +412,7 @@ public class DelayShot extends AppCompatActivity
                 Log.e(DELAYSHOT_TAG, "ACTION_GATT_DISCONNECTED");
                 connect_status_bit=true;
                 mConnected = true;
-                mBluetoothLeService.disconnect();
+                //mBluetoothLeService.disconnect();
                 unbindService(mServiceConnection);
                 mBluetoothLeService = null;
                 timer.cancel();
@@ -623,8 +623,8 @@ public class DelayShot extends AppCompatActivity
                     {
                         Log.e(DELAYSHOT_TAG,"mConnected==false");
                         //updateConnectionState(R.string.connecting);
-                        final boolean result = mBluetoothLeService.connect(mDeviceAddress);
-                        Log.e(DELAYSHOT_TAG, "Connect request result=" + result);
+                        //final boolean result = mBluetoothLeService.connect(mDeviceAddress);
+                        //Log.e(DELAYSHOT_TAG, "Connect request result=" + result);
                     }
                 }
             }
@@ -792,8 +792,8 @@ public class DelayShot extends AppCompatActivity
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
         if (mBluetoothLeService != null) {
 
-            final boolean result = mBluetoothLeService.connect(mDeviceAddress);
-            Log.e(DELAYSHOT_TAG, "delayshot onResume connect " + result);
+            //final boolean result = mBluetoothLeService.connect(mDeviceAddress);
+            //Log.e(DELAYSHOT_TAG, "delayshot onResume connect " + result);
         }
     }
 
@@ -801,7 +801,7 @@ public class DelayShot extends AppCompatActivity
     protected void onPause() {
         Log.e(DELAYSHOT_TAG, "delayshot onPause");
         super.onPause();
-        //unregisterReceiver(mGattUpdateReceiver);
+        unregisterReceiver(mGattUpdateReceiver);
     }
 
     @Override

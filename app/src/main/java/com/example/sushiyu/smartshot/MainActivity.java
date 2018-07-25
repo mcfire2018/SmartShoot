@@ -73,6 +73,7 @@ public class MainActivity extends AppCompatActivity
     private BluetoothAdapter mBluetoothAdapter;
     private boolean mScanning;
     private Handler mHandler;
+    private boolean service_binded;
     /*0 for vedio mode key press
     * 1 for delay mode
     * 2 for ab point mode*/
@@ -96,7 +97,7 @@ public class MainActivity extends AppCompatActivity
     View view1;
     LayoutInflater inflater1;
     ActionBarDrawerToggle toggle;
-    public BluetoothLeService mBluetoothLeService;
+    public static BluetoothLeService mBluetoothLeService;
     public boolean mConnected = false;
     private Intent connect_intent;
     public  boolean connect_status_bit=false;
@@ -215,6 +216,7 @@ public class MainActivity extends AppCompatActivity
                     timer.schedule(task, 10, 100);
                     boolean sg;
                     Intent gattServiceIntent = new Intent(MainActivity.this, BluetoothLeService.class);
+
                     sg = bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
                     registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
                     //updateConnectionState(R.string.connecting);
@@ -235,7 +237,11 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-
+        if (mBluetoothLeService != null)
+        {
+            Log.e(MAINACTIVITY_TAG, "(mBluetoothLeService != null)");
+            mBluetoothLeService.disconnect();
+        }
 
     }
 
@@ -264,8 +270,8 @@ public class MainActivity extends AppCompatActivity
                     if( mConnected==false )
                     {
                         //updateConnectionState(R.string.connecting);
-                        final boolean result = mBluetoothLeService.connect(mDeviceAddress);
-                        Log.e(MAINACTIVITY_TAG, "Connect request result=" + result);
+                        //final boolean result = mBluetoothLeService.connect(mDeviceAddress);
+                        //Log.e(MAINACTIVITY_TAG, "Connect request result=" + result);
                     }
                 }
             }
@@ -675,6 +681,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume() {//打开APP时扫描设备
         super.onResume();
+
         scanLeDevice(true);
         lv_bleList.setEnabled(true);
         lv_bleList.setVisibility(View.VISIBLE);
@@ -686,6 +693,7 @@ public class MainActivity extends AppCompatActivity
         super.onPause();
         scanLeDevice(false);
         unregisterReceiver(mGattUpdateReceiver);
+        //unbindService(mServiceConnection);
     }
 
     @Override

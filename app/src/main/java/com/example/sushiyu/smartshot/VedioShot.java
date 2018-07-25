@@ -293,9 +293,9 @@ public class VedioShot extends AppCompatActivity
             }
             {
                 boolean result;
-                result = mBluetoothLeService.connect(mDeviceAddress);
-                Log.e(VEDIOSHOT_TAG, "VedioShoot Connect Result "+result);
-                if (result)
+                //result = mBluetoothLeService.connect(mDeviceAddress);
+                //Log.e(VEDIOSHOT_TAG, "VedioShoot Connect Result "+result);
+                //if (result)
                 {
                     mConnected = true;
                     connect_status_bit=true;
@@ -327,7 +327,8 @@ public class VedioShot extends AppCompatActivity
             } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
                 Log.e(VEDIOSHOT_TAG, "ACTION_GATT_DISCONNECTED");
                 mConnected = false;
-                mBluetoothLeService.disconnect();
+                //mBluetoothLeService.disconnect();
+                unbindService(mServiceConnection);
                 mBluetoothLeService = null;
                 timer.cancel();
                 timer=null;
@@ -494,8 +495,8 @@ public class VedioShot extends AppCompatActivity
                     if( mConnected==false )
                     {
                         //updateConnectionState(R.string.connecting);
-                        final boolean result = mBluetoothLeService.connect(mDeviceAddress);
-                        Log.e(VEDIOSHOT_TAG, "Connect request result=" + result);
+                        //final boolean result = mBluetoothLeService.connect(mDeviceAddress);
+                        //Log.e(VEDIOSHOT_TAG, "Connect request result=" + result);
                     }
                 }
             }
@@ -667,8 +668,8 @@ public class VedioShot extends AppCompatActivity
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
         if (mBluetoothLeService != null) {
 
-            final boolean result = mBluetoothLeService.connect(mDeviceAddress);
-            Log.e(VEDIOSHOT_TAG, "Connect request result=" + result);
+            //final boolean result = mBluetoothLeService.connect(mDeviceAddress);
+            //Log.e(VEDIOSHOT_TAG, "Connect request result=" + result);
         }
     }
 

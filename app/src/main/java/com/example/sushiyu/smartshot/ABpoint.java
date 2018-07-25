@@ -249,9 +249,9 @@ public class ABpoint extends AppCompatActivity
             {
                 boolean result;
                 Log.e(ABPOINT_TAG, "ABPoint BBB!");
-                result = mBluetoothLeService.connect(mDeviceAddress);
-                Log.e(ABPOINT_TAG, "ABPoint connect "+result);
-                if (result)
+                //result = mBluetoothLeService.connect(mDeviceAddress);
+                //Log.e(ABPOINT_TAG, "ABPoint connect "+result);
+                //if (result)
                 {
                     mConnected = true;
                     connect_status_bit=true;
@@ -276,7 +276,7 @@ public class ABpoint extends AppCompatActivity
             } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
                 connect_status_bit=true;
                 mConnected = true;
-                mBluetoothLeService.disconnect();
+                //mBluetoothLeService.disconnect();
                 unbindService(mServiceConnection);
                 mBluetoothLeService = null;
                 timer.cancel();
@@ -463,8 +463,8 @@ public class ABpoint extends AppCompatActivity
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
         if (mBluetoothLeService != null) {
 
-            final boolean result = mBluetoothLeService.connect(mDeviceAddress);
-            Log.e(ABPOINT_TAG, "abpoint onResume connect " + result);
+            //final boolean result = mBluetoothLeService.connect(mDeviceAddress);
+            //Log.e(ABPOINT_TAG, "abpoint onResume connect " + result);
         }
     }
 
