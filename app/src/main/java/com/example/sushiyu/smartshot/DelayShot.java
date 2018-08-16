@@ -413,6 +413,7 @@ public class DelayShot extends AppCompatActivity
                 connect_status_bit=true;
                 mConnected = true;
                 //mBluetoothLeService.disconnect();
+                unregisterReceiver(mGattUpdateReceiver);
                 unbindService(mServiceConnection);
                 mBluetoothLeService = null;
                 timer.cancel();
@@ -801,7 +802,7 @@ public class DelayShot extends AppCompatActivity
     protected void onPause() {
         Log.e(DELAYSHOT_TAG, "delayshot onPause");
         super.onPause();
-        unregisterReceiver(mGattUpdateReceiver);
+        //unregisterReceiver(mGattUpdateReceiver);
     }
 
     @Override

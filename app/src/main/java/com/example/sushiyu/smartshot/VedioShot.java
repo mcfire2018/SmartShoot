@@ -686,6 +686,7 @@ public class VedioShot extends AppCompatActivity
         super.onDestroy();
         mBluetoothLeService.disconnect();
         unbindService(mServiceConnection);
+        unregisterReceiver(mGattUpdateReceiver);
         mBluetoothLeService = null;
         timer.cancel();
         timer=null;
