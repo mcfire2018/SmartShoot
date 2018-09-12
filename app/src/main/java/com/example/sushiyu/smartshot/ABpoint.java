@@ -58,6 +58,7 @@ public class ABpoint extends AppCompatActivity
     private boolean abpoint_set_flag = false;
     private TextView abpoint_set;
     private TextView tv_notification;
+    private boolean screen_toggle;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -455,6 +456,19 @@ public class ABpoint extends AppCompatActivity
         return false;
     }
 
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        screen_toggle = true;
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            //text_screen.append("\n 当前屏幕为横屏");
+        } else {
+            //text_screen.append("\n 当前屏幕为竖屏");
+        }
+        super.onConfigurationChanged(newConfig);
+        //Log.e("TAG", "onConfigurationChanged");
+        //  setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);  //设置横屏
+    }
+
 
     @Override
     protected void onResume() {
@@ -479,11 +493,15 @@ public class ABpoint extends AppCompatActivity
     protected void onDestroy() {
         Log.e(ABPOINT_TAG, "abpoint onDestroy");
         super.onDestroy();
-        mBluetoothLeService.disconnect();
-        unbindService(mServiceConnection);
-        mBluetoothLeService = null;
-        timer.cancel();
-        timer=null;
+        if (screen_toggle == false) {
+            mBluetoothLeService.disconnect();
+            unbindService(mServiceConnection);
+            mBluetoothLeService = null;
+            timer.cancel();
+            timer = null;
+        }else{
+            screen_toggle = false;
+        }
     }
 
 

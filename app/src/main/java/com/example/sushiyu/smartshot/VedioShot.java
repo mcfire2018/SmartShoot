@@ -65,7 +65,7 @@ public class VedioShot extends AppCompatActivity
     private ImageButton img_btn_start;
     private boolean start_press_flag;
     private boolean get_param_success;
-
+    private boolean screen_toggle;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -652,6 +652,18 @@ public class VedioShot extends AppCompatActivity
         }
 
     }
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        screen_toggle = true;
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            //text_screen.append("\n 当前屏幕为横屏");
+        } else {
+            //text_screen.append("\n 当前屏幕为竖屏");
+        }
+        super.onConfigurationChanged(newConfig);
+        //Log.e("TAG", "onConfigurationChanged");
+        //  setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);  //设置横屏
+    }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -684,12 +696,19 @@ public class VedioShot extends AppCompatActivity
     protected void onDestroy() {
         Log.e(VEDIOSHOT_TAG, "III");
         super.onDestroy();
-        mBluetoothLeService.disconnect();
-        unbindService(mServiceConnection);
-        unregisterReceiver(mGattUpdateReceiver);
-        mBluetoothLeService = null;
-        timer.cancel();
-        timer=null;
+        if (screen_toggle == false)
+        {
+            mBluetoothLeService.disconnect();
+            unbindService(mServiceConnection);
+            unregisterReceiver(mGattUpdateReceiver);
+            mBluetoothLeService = null;
+            timer.cancel();
+            timer=null;
+        }
+        else
+        {
+            screen_toggle = false;
+        }
     }
 
     private static IntentFilter makeGattUpdateIntentFilter() {

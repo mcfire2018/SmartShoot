@@ -111,7 +111,10 @@ public class BluetoothLeService extends Service {
     }
 
 
-
+    public void gatt_discoverServices(){
+        Log.i(TAG, "Attempting to start service discovery:" +
+                mBluetoothGatt.discoverServices());
+    }
 
 
     byte[] WriteBytes = new byte[20];
@@ -460,14 +463,13 @@ public class BluetoothLeService extends Service {
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
             String intentAction;
+            Log.e("mcfire_main", "status "+status);
             if (newState == BluetoothProfile.STATE_CONNECTED) {
                 intentAction = ACTION_GATT_CONNECTED;
                 mConnectionState = STATE_CONNECTED;
                 broadcastUpdate(intentAction);
                 Log.i(TAG, "Connected to GATT server.");
                 // Attempts to discover services after successful connection.
-                Log.i(TAG, "Attempting to start service discovery:" +
-                        mBluetoothGatt.discoverServices());
 
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 intentAction = ACTION_GATT_DISCONNECTED;
@@ -476,6 +478,16 @@ public class BluetoothLeService extends Service {
                 Log.e("sushiyu", "Disconnected from GATT server.");
                 broadcastUpdate(intentAction);
             }
+            /*
+            if (newState == BluetoothProfile.STATE_CONNECTED) {
+
+            } else if (status==133&&newState == BluetoothProfile.STATE_DISCONNECTED) {
+                mBluetoothGatt.close();
+            }else if (status==BluetoothGatt.GATT_FAILURE&&newState == BluetoothProfile.STATE_DISCONNECTED){
+
+            } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
+                mBluetoothGatt.close();
+            }*/
         }
 
         @Override

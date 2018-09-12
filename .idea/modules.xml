@@ -4,8 +4,10 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/SmartShot.iml" filepath="$PROJECT_DIR$/SmartShot.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/mcfire.iml" filepath="$PROJECT_DIR$/mcfire.iml" />
       <module fileurl="file://$PROJECT_DIR$/mcfire2018.iml" filepath="$PROJECT_DIR$/mcfire2018.iml" />
+      <module fileurl="file://$PROJECT_DIR$/smartshoot.iml" filepath="$PROJECT_DIR$/smartshoot.iml" />
     </modules>
   </component>
 </project>

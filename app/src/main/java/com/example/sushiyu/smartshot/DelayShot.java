@@ -84,7 +84,7 @@ public class DelayShot extends AppCompatActivity
     private int baoguang_hour;
     private int baoguang_minute;
     private int baoguang_second;
-
+    private boolean screen_toggle;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -777,6 +777,19 @@ public class DelayShot extends AppCompatActivity
     }
 
     @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        screen_toggle = true;
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            //text_screen.append("\n 当前屏幕为横屏");
+        } else {
+            //text_screen.append("\n 当前屏幕为竖屏");
+        }
+        super.onConfigurationChanged(newConfig);
+        //Log.e("TAG", "onConfigurationChanged");
+        //  setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);  //设置横屏
+    }
+
+    @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             return true;
@@ -809,12 +822,17 @@ public class DelayShot extends AppCompatActivity
     protected void onDestroy() {
         Log.e(DELAYSHOT_TAG, "delayshot onDestroy");
         super.onDestroy();
-        mBluetoothLeService.disconnect();
-        unbindService(mServiceConnection);
-        mBluetoothLeService = null;
-        timer.cancel();
-        timer=null;
-        unregisterReceiver(mGattUpdateReceiver);
+
+        if (screen_toggle == false) {
+            mBluetoothLeService.disconnect();
+            unbindService(mServiceConnection);
+            mBluetoothLeService = null;
+            timer.cancel();
+            timer = null;
+            unregisterReceiver(mGattUpdateReceiver);
+        }else{
+            screen_toggle = true;
+        }
     }
 
 

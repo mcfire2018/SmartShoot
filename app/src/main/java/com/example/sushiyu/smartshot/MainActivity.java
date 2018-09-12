@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity
     private int wait_receive_mcu_msg_to = 26;
     private int timeout_flag = 0;
     private boolean get_param_success;
-
+    private boolean screen_toggle;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -192,6 +192,7 @@ public class MainActivity extends AppCompatActivity
                         return;
                     }
                     Toast.makeText(MainActivity.this, R.string.Connecting, Toast.LENGTH_LONG).show();
+                    scanLeDevice(false);
                     /*
                     Log.e(MAINACTIVITY_TAG, device_select.getName());
                     Log.e(MAINACTIVITY_TAG, device_select.getAddress());
@@ -283,6 +284,10 @@ public class MainActivity extends AppCompatActivity
         public void run() {
             wait_receive_mcu_msg_to--;
             Log.e(MAINACTIVITY_TAG, "task_wait_mcu cnt = "+wait_receive_mcu_msg_to);
+            if (wait_receive_mcu_msg_to == 23)
+            {
+                mBluetoothLeService.gatt_discoverServices();
+            }
             if (wait_receive_mcu_msg_to < 19)
             {
                 Log.e(MAINACTIVITY_TAG, " task_wait_mcu 0 cnt = "+wait_receive_mcu_msg_to);
@@ -679,6 +684,19 @@ public class MainActivity extends AppCompatActivity
     };
 
     @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        screen_toggle = true;
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            //text_screen.append("\n 当前屏幕为横屏");
+        } else {
+            //text_screen.append("\n 当前屏幕为竖屏");
+        }
+        super.onConfigurationChanged(newConfig);
+        //Log.e("TAG", "onConfigurationChanged");
+        //  setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);  //设置横屏
+    }
+
+    @Override
     protected void onResume() {//打开APP时扫描设备
         super.onResume();
 
@@ -700,13 +718,17 @@ public class MainActivity extends AppCompatActivity
     protected void onDestroy() {
         Log.e(MAINACTIVITY_TAG, "MainActivity onDestroy");
         super.onDestroy();
-        mBluetoothLeService.disconnect();
-        unbindService(mServiceConnection);
-        mBluetoothLeService = null;
-        timer.cancel();
-        timer_wait_mcu.cancel();
-        timer=null;
-        timer_wait_mcu = null;
+        if (screen_toggle == false) {
+            mBluetoothLeService.disconnect();
+            unbindService(mServiceConnection);
+            mBluetoothLeService = null;
+            timer.cancel();
+            timer_wait_mcu.cancel();
+            timer = null;
+            timer_wait_mcu = null;
+        }else{
+            screen_toggle = false;
+        }
     }
 
 
